@@ -1,0 +1,2440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - GoodDollar Analytics</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GoodMarket">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 25%, #312e81 50%, #1e1b4b 75%, #0f172a 100%);
+            background-size: 400% 400%;
+            animation: gradientShift 15s ease infinite;
+            min-height: 100vh;
+            color: #f1f5f9;
+            overflow-x: hidden;
+            position: relative;
+            font-size: 11px;
+            zoom: 0.85;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+
+
+        @media (min-width: 768px) {
+            body {
+                font-size: 12px;
+            }
+        }
+
+
+
+        .navbar {
+            background: linear-gradient(90deg, rgba(26, 11, 46, 0.9) 0%, rgba(45, 27, 61, 0.9) 50%, rgba(26, 11, 46, 0.9) 100%);
+            backdrop-filter: blur(20px);
+            border-bottom: 2px solid rgba(255, 140, 0, 0.3);
+            padding: 0.5rem 0.75rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 4px 30px rgba(148, 0, 211, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .navbar {
+                padding: 0.75rem 1.5rem;
+            }
+        }
+
+        .nav-brand {
+            font-size: 1.1rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .nav-brand {
+                font-size: 1.5rem;
+            }
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        @media (min-width: 768px) {
+            .nav-links {
+                gap: 1rem;
+            }
+        }
+
+        .nav-link {
+            color: rgba(241, 245, 249, 0.8);
+            text-decoration: none;
+            padding: 0.4rem 0.75rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 0.8rem;
+        }
+
+        @media (min-width: 768px) {
+            .nav-link {
+                padding: 0.5rem 1rem;
+                font-size: 0.95rem;
+            }
+        }
+
+        .nav-link:hover {
+            background: rgba(99, 102, 241, 0.2);
+            color: #f1f5f9;
+            transform: translateY(-2px);
+        }
+
+        .inbox-icon {
+            position: relative;
+            cursor: pointer;
+            font-size: 1.5rem;
+            padding: 0.5rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .inbox-icon:hover {
+            background: rgba(99, 102, 241, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .logout-btn {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            border: none;
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 10px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(239, 68, 68, 0.4);
+        }
+
+        .main-content {
+            padding: 0.75rem;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 10;
+        }
+
+        @media (min-width: 768px) {
+            .main-content {
+                padding: 1.25rem;
+            }
+        }
+
+        .dashboard-header {
+            margin-bottom: 1rem;
+        }
+
+        @media (min-width: 768px) {
+            .dashboard-header {
+                margin-bottom: 1.5rem;
+            }
+        }
+
+        .welcome-text {
+            font-size: 1.3rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            letter-spacing: -0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .welcome-text {
+                font-size: 2rem;
+                letter-spacing: -1px;
+            }
+        }
+
+        .wallet-info {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+        }
+
+        .wallet-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: rgba(255, 165, 0, 0.08);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 140, 0, 0.3);
+            border-radius: 12px;
+            padding: 0.75rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(148, 0, 211, 0.2);
+        }
+
+        @media (min-width: 768px) {
+            .stat-card {
+                border-radius: 14px;
+                padding: 1rem;
+            }
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .stat-card:hover::before {
+            opacity: 1;
+        }
+
+        .stat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 20px rgba(99, 102, 241, 0.3);
+        }
+
+        @media (min-width: 768px) {
+            .stat-icon {
+                width: 60px;
+                height: 60px;
+                border-radius: 16px;
+                font-size: 2rem;
+            }
+        }
+
+        .stat-title {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: rgba(241, 245, 249, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .stat-title {
+                font-size: 0.9rem;
+                letter-spacing: 1px;
+            }
+        }
+
+        .stat-value {
+            font-size: 1.4rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        @media (min-width: 768px) {
+            .stat-value {
+                font-size: 1.8rem;
+                letter-spacing: -1px;
+            }
+        }
+
+        .stat-description {
+            font-size: 0.8rem;
+            color: rgba(241, 245, 249, 0.6);
+        }
+
+        @media (min-width: 768px) {
+            .stat-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(99, 102, 241, 0.3);
+            border-top: 3px solid #6366f1;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        @keyframes shimmer {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.5; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.1); }
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+
+        .community-stories-card {
+            box-shadow: 0 8px 32px rgba(251, 191, 36, 0.3) !important;
+        }
+
+        .community-stories-card:hover {
+            box-shadow: 0 15px 45px rgba(251, 191, 36, 0.5) !important;
+            border-color: rgba(251, 191, 36, 0.8) !important;
+            transform: translateY(-8px) scale(1.02) !important;
+        }
+
+        .quick-actions {
+            margin-bottom: 2rem;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+        }
+
+        .action-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1rem;
+        }
+
+        /* Unified Inbox Styles */
+        .inbox-badge {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            animation: pulse 2s infinite;
+        }
+
+        .inbox-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .inbox-content {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 90vh;
+            overflow-y: auto;
+            padding: 2rem;
+            position: relative;
+        }
+
+        .inbox-item {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .inbox-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+        }
+
+        .inbox-item.unread {
+            border-color: #ef4444;
+            background: rgba(239, 68, 68, 0.1);
+        }
+
+        .inbox-item.broadcast {
+            border-color: #fbbf24;
+            background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.15));
+        }
+
+        .voice-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.75rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border-radius: 12px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+
+        .voice-indicator:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes voiceWave {
+            0%, 100% { transform: scaleY(1); }
+            50% { transform: scaleY(1.5); }
+        }
+
+        .voice-playing {
+            animation: voiceWave 0.5s infinite;
+        }
+
+        .action-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 12px;
+            padding: 1rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            color: #f1f5f9;
+            position: relative;
+            overflow: hidden;
+            z-index: 10;
+            pointer-events: auto;
+        }
+
+        @media (min-width: 768px) {
+            .action-card {
+                border-radius: 16px;
+                padding: 1.5rem;
+            }
+        }
+
+        .action-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .action-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .action-card:hover::before {
+            opacity: 1;
+        }
+
+        .action-icon {
+            font-size: 1.75rem;
+            margin-bottom: 0.75rem;
+            filter: drop-shadow(0 4px 8px rgba(99, 102, 241, 0.3));
+        }
+
+        @media (min-width: 768px) {
+            .action-icon {
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+        }
+
+        .action-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: #f1f5f9;
+        }
+
+        @media (min-width: 768px) {
+            .action-title {
+                font-size: 1.1rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+
+        .action-description {
+            font-size: 0.8rem;
+            color: rgba(241, 245, 249, 0.7);
+        }
+
+        @media (min-width: 768px) {
+            .action-description {
+                font-size: 0.9rem;
+            }
+        }
+
+        .claim-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 12px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-size: 0.95rem;
+        }
+
+        .claim-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4);
+        }
+
+        .claim-btn:disabled {
+            background: rgba(100, 116, 139, 0.5);
+            cursor: not-allowed;
+            color: rgba(241, 245, 249, 0.5);
+        }
+
+        .notification-toast {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(20px);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 16px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            z-index: 10000;
+            max-width: 400px;
+            animation: slideInRight 0.3s ease;
+        }
+
+        .notification-content {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .notification-icon {
+            font-size: 28px;
+            flex-shrink: 0;
+        }
+
+        .notification-text {
+            flex: 1;
+        }
+
+        .notification-message {
+            font-size: 14px;
+            font-weight: 600;
+            line-height: 1.4;
+        }
+
+        .notification-close {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            padding: 0;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .notification-close:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Edit Username Modal */
+        #editUsernameModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: linear-gradient(135deg, #1e293b, #334155);
+            padding: 2.5rem;
+            border-radius: 24px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content h3 {
+            margin-bottom: 1.5rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+        }
+
+        .warning-box {
+            background: rgba(251, 191, 36, 0.1);
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            border-left: 3px solid #fbbf24;
+        }
+
+        .warning-box small {
+            color: rgba(241, 245, 249, 0.9);
+            line-height: 1.5;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: rgba(241, 245, 249, 0.9);
+            font-weight: 600;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(99, 102, 241, 0.3);
+            color: white;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 1rem;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            width: 100%;
+            padding: 0.875rem;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        /* Referral styles */
+        .analytics-card {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(99, 102, 241, 0.3);
+            border-color: rgba(99, 102, 241, 0.5);
+        }
+
+        .analytics-card .card-header {
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(99, 102, 241, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .analytics-card .card-header h5 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .gooddollar-icon {
+            font-size: 1.5rem;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .analytics-card .card-body {
+            font-size: 0.9rem;
+            color: rgba(241, 245, 249, 0.8);
+            line-height: 1.6;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: #ef4444;
+            border-left: 3px solid #ef4444;
+        }
+
+        .alert-warning {
+            background-color: rgba(251, 191, 36, 0.1);
+            color: #fbbf24;
+            border-left: 3px solid #fbbf24;
+        }
+
+        .action-btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #6366f1, #a855f7);
+            border: none;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.9rem;
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 35px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Specific spinner for referral section */
+        #referralSection .spinner-border {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(66, 153, 225, 0.3);
+            border-top-color: #3b82f6;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+
+        /* Telegram Task History Modal */
+        #telegramTaskHistoryModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        #telegramTaskHistoryModal .modal-content {
+            max-width: 600px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            margin: auto;
+        }
+
+        #telegramTaskHistoryModal h3 {
+            margin-bottom: 1rem;
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        #telegramTaskHistoryModal .history-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #telegramTaskHistoryModal .stat-card-history {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+        }
+
+        #telegramTaskHistoryModal .stat-title-history {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(241, 245, 249, 0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.5rem;
+        }
+
+        #telegramTaskHistoryModal .stat-value-history {
+            font-size: 2rem;
+            font-weight: 800;
+            color: #f1f5f9;
+            letter-spacing: -0.5px;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .nav-links {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .welcome-text {
+                font-size: 1.8rem;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .action-grid {
+                grid-template-columns: 1fr;
+            }
+
+            #telegramTaskHistoryModal .history-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .history-tabs {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .history-tab {
+                width: 80%;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background Particles -->
+    <div class="bg-particles">
+        <div class="particle" style="left: 10%; animation-delay: 0s;"></div>
+        <div class="particle" style="left: 20%; animation-delay: 2s;"></div>
+        <div class="particle" style="left: 30%; animation-delay: 4s;"></div>
+        <div class="particle" style="left: 40%; animation-delay: 1s;"></div>
+        <div class="particle" style="left: 50%; animation-delay: 3s;"></div>
+        <div class="particle" style="left: 60%; animation-delay: 5s;"></div>
+        <div class="particle" style="left: 70%; animation-delay: 2.5s;"></div>
+        <div class="particle" style="left: 80%; animation-delay: 4.5s;"></div>
+        <div class="particle" style="left: 90%; animation-delay: 1.5s;"></div>
+    </div>
+
+    <nav class="navbar">
+        <div class="nav-brand">🌟 GoodDollar Market by GIMT Team</div>
+        <div class="nav-links">
+            <a href="/dashboard" class="nav-link">Dashboard</a>
+            <a href="/overview" class="nav-link">Overview</a>
+            <a href="/news" class="nav-link">News</a>
+            <a href="/forum" class="nav-link">Forum</a>
+            <div class="inbox-icon" onclick="openInboxModal()" title="Unified Inbox">
+                📬
+                <div id="inboxBadge" class="inbox-badge" style="display: none;">0</div>
+            </div>
+            <a href="/admin" class="nav-link" id="adminLink" style="display: none; background: linear-gradient(135deg, #ef4444, #dc2626); color: white; font-weight: 700;">🔐 Admin</a>
+            <a href="/logout" class="logout-btn">Logout</a>
+        </div>
+    </nav>
+
+    <div class="main-content">
+        <div class="dashboard-header">
+            <h1 class="welcome-text">Hi, <span id="usernameDisplay">User</span>! 👋</h1>
+            <div class="wallet-info">
+                <div class="wallet-icon">👛</div>
+                <div>
+                    <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.7);">Wallet Address</div>
+                    <div style="font-weight: 600; font-family: monospace; font-size: 0.95rem;">
+                        <span id="walletAddress">{{ wallet[:10] }}...{{ wallet[-8:] }}</span>
+                    </div>
+                </div>
+            </div>
+            <button id="editUsernameBtn" class="claim-btn" style="display: none; margin-top: 1rem;" onclick="showEditUsernameModal()">
+                ✏️ Edit Username (One-time only)
+            </button>
+        </div>
+
+        <!-- Main Balance Card - Full Width Hero -->
+        <div style="background: linear-gradient(135deg, #6366f1, #a855f7); border-radius: 24px; padding: 2.5rem; margin-bottom: 2rem; box-shadow: 0 20px 60px rgba(99, 102, 241, 0.4);">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1.5rem;">
+                <div>
+                    <div style="font-size: 0.8rem; color: rgba(255,255,255,0.8); margin-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px;">Your GoodDollar Balance</div>
+                    <div style="font-size: 2rem; font-weight: 900; color: white; line-height: 1; margin-bottom: 0.5rem;" id="gdBalance">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div style="font-size: 0.85rem; color: rgba(255,255,255,0.9);">≈ Available for spending, trading & staking</div>
+                </div>
+                <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                    <a href="/minigames/" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 12px; color: white; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        🎮 Play & Earn
+                    </a>
+                    <a href="/learn-earn" style="background: rgba(255,255,255,0.2); backdrop-filter: blur(10px); padding: 1rem 1.5rem; border-radius: 12px; color: white; text-decoration: none; font-weight: 700; transition: all 0.3s ease; border: 2px solid rgba(255,255,255,0.3);" onmouseover="this.style.background='rgba(255,255,255,0.3)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'">
+                        📚 Learn & Earn
+                    </a>
+                </div></div>
+            </div>
+        </div>
+
+        <!-- Quick Earnings Section -->
+        <div style="margin-bottom: 2rem;">
+            <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; color: #f1f5f9;">⚡ Quick Earnings</h2>
+            <div class="stats-grid">
+                <div class="stat-card" style="border: 2px solid rgba(29, 161, 242, 0.4); background: linear-gradient(135deg, rgba(29, 161, 242, 0.1), rgba(29, 161, 242, 0.05));">
+                    <div class="stat-header">
+                        <div>
+                            <div class="stat-title">Daily Social Task</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #1da1f2, #0d8bd9);">📱</div>
+                    </div>
+                    <div class="stat-value" id="dailyTaskStatus">
+                        <div class="loading-spinner"></div>
+                    </div>
+                    <div class="stat-description" id="dailyTaskDesc">Checking status...</div>
+
+                    <!-- Pending Submission Alert -->
+                    <div id="dailyTaskPendingAlert" class="alert alert-warning" style="display: none; margin-top: 1rem;">
+                        <div id="pendingPlatformText"></div>
+                    </div>
+
+                    <button id="claimDailyTaskBtn" class="claim-btn" style="display: none; background: linear-gradient(135deg, #1da1f2, #0d8bd9); position: relative; z-index: 100; pointer-events: auto; cursor: pointer; width: 100%; margin-top: 1rem; padding: 0.85rem;" onclick="event.stopPropagation(); event.preventDefault(); showDailyTaskModal(); return false;">
+                        🎁 Claim 100 G$
+                    </button>
+                    <button onclick="event.stopPropagation(); event.preventDefault(); showDailyTaskHistory(); return false;" class="btn-secondary" style="margin-top: 0.5rem; width: 100%; padding: 0.65rem; font-size: 0.85rem; position: relative; z-index: 100; pointer-events: auto; cursor: pointer;">
+                        📊 View History
+                    </button>
+                </div>
+
+                <div class="stat-card community-stories-card" style="border: 2px solid rgba(251, 191, 36, 0.6); background: linear-gradient(135deg, rgba(251, 191, 36, 0.15), rgba(245, 158, 11, 0.1)); position: relative; overflow: hidden;">
+                    <div style="position: absolute; top: -50%; right: -50%; width: 200%; height: 200%; background: radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%); animation: pulse 3s ease-in-out infinite;"></div>
+                    <div class="stat-header" style="position: relative; z-index: 2;">
+                        <div>
+                            <div class="stat-title" style="color: #fbbf24;">Community Stories</div>
+                        </div>
+                        <div class="stat-icon" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); font-size: 2rem; animation: bounce 2s infinite;">🌟</div>
+                    </div>
+                    <div class="stat-value" style="color: #fbbf24; position: relative; z-index: 2;">Up to 5,000 G$</div>
+                    <div class="stat-description" style="color: rgba(251, 191, 36, 0.9); font-weight: 600; position: relative; z-index: 2;">Share your story & earn big!</div>
+                    <a href="/community-stories/" class="claim-btn" style="background: linear-gradient(135deg, #fbbf24, #f59e0b); width: 100%; margin-top: 1rem; padding: 0.85rem; display: block; text-align: center; text-decoration: none; position: relative; z-index: 2;">
+                        ✨ Share Story Now
+                    </a>
+                </div>
+
+
+            </div>
+        </div>
+
+
+        <!-- Earn More Section -->
+        <div class="quick-actions">
+            <h2 class="section-title">💎 More Ways to Earn</h2>
+            <div class="action-grid" style="grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));">
+                <a href="/learn-earn" class="action-card" style="border-color: rgba(99, 102, 241, 0.4); background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(139, 92, 246, 0.05));">
+                    <div class="action-icon" style="font-size: 3rem;">📚</div>
+                    <div class="action-title" style="font-size: 1.3rem;">Learn & Earn</div>
+                    <div class="action-description" style="font-size: 1rem; margin-bottom: 0.5rem;">Complete educational quizzes</div>
+                    <div style="background: linear-gradient(135deg, #6366f1, #a855f7); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; margin-top: 0.5rem;">
+                        Earn up to 2,000 G$ per quiz
+                    </div>
+                </a>
+
+                <a href="/minigames/" class="action-card" style="border-color: rgba(168, 85, 247, 0.4); background: linear-gradient(135deg, rgba(168, 85, 247, 0.1), rgba(168, 85, 247, 0.05));">
+                    <div class="action-icon" style="font-size: 3rem;">🎮</div>
+                    <div class="action-title" style="font-size: 1.3rem;">Play Minigames</div>
+                    <div class="action-description" style="font-size: 1rem; margin-bottom: 0.5rem;">Have fun and win rewards</div>
+                    <div style="background: linear-gradient(135deg, #a855f7, #ec4899); color: white; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 700; margin-top: 0.5rem;">
+                        Multiple games available
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Platform Features -->
+        <div style="margin-top: 2rem;">
+            <h2 class="section-title">🛠️ Platform Features</h2>
+            <div class="action-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                <a href="/overview" class="action-card">
+                    <div class="action-icon">📈</div>
+                    <div class="action-title">Analytics</div>
+                    <div class="action-description">View detailed statistics</div>
+                </a>
+
+                <a href="/news" class="action-card">
+                    <div class="action-icon">📰</div>
+                    <div class="action-title">News Feed</div>
+                    <div class="action-description">Latest updates</div>
+                </a>
+
+                <a href="javascript:void(0)" id="airtimeDataCard" class="action-card" style="opacity: 0.6; cursor: not-allowed;">
+                    <div class="action-icon">💳</div>
+                    <div class="action-title">Airtime & Data</div>
+                    <div class="action-description">Coming Soon!</div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Daily Task Modal (Twitter/Telegram Choice) -->
+    <div id="dailyTaskModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto; padding: 1rem;">
+        <div class="modal-content" style="max-width: 500px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+            <h3 style="margin-bottom: 1rem;">📱 Daily Task - Earn 100 G$</h3>
+
+            <!-- Platform Selection -->
+            <div id="platformSelection" style="margin-bottom: 1.5rem;">
+                <p style="margin-bottom: 1rem; color: rgba(241, 245, 249, 0.8); line-height: 1.5; font-size: 0.95rem;">
+                    Choose ONE platform to post and earn 100 G$ today:
+                </p>
+                <div style="display: flex; gap: 1rem; flex-direction: column;">
+                    <button onclick="selectPlatform('twitter')" class="platform-btn" style="padding: 1rem; background: linear-gradient(135deg, #1da1f2, #0d8bd9); border: none; color: white; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        🐦 Twitter/X
+                    </button>
+                    <button onclick="selectPlatform('telegram')" class="platform-btn" style="padding: 1rem; background: linear-gradient(135deg, #0088cc, #006699); border: none; color: white; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        📱 Telegram
+                    </button>
+                    <button onclick="selectPlatform('facebook')" class="platform-btn" style="padding: 1rem; background: linear-gradient(135deg, #1877f2, #0d5dbf); border: none; color: white; border-radius: 12px; cursor: pointer; font-weight: 700; font-size: 1rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                        📘 Facebook
+                    </button>
+                </div>
+            </div>
+
+            <!-- Task Submission Form (Hidden by default) -->
+            <div id="taskSubmissionForm" style="display: none;">
+                <p style="margin-bottom: 1rem; color: rgba(241, 245, 249, 0.8); line-height: 1.5; font-size: 0.95rem;">
+                    Post the message below to <span id="selectedPlatformName"></span>,
+                    then copy your post link and submit it here to claim your 100 G$ reward!
+                </p>
+                <div id="taskMessageDisplay" style="background: rgba(0,0,0,0.3); padding: 1rem; border-radius: 12px; margin-bottom: 1rem; position: relative; cursor: text; user-select: text;">
+                    <div class="loading-spinner"></div>
+                </div>
+                <button onclick="copyTaskMessage()" class="btn-secondary" style="margin-bottom: 1rem; width: 100%; padding: 0.75rem;">
+                    📋 Copy Message
+                </button>
+
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; color: white; font-size: 0.95rem;"><span id="platformUrlLabel"></span> Post URL:</label>
+                    <input type="url" id="taskUrlInput" placeholder="" style="width: 100%; padding: 0.75rem; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); border-radius: 8px; color: white; margin-bottom: 1rem; font-size: 1rem; -webkit-appearance: none;">
+                </div>
+
+                <div style="display: flex; gap: 1rem; flex-direction: column;">
+                    <button onclick="goBackToPlatformSelection()" class="btn-secondary" style="padding: 0.75rem; font-size: 0.95rem;">
+                        ← Back to Platform Selection
+                    </button>
+                    <button id="submitDailyTaskBtn" onclick="submitDailyTask(event)" class="btn-primary" style="padding: 1rem; font-size: 1rem; cursor: pointer; touch-action: manipulation;">
+                        ✅ Submit & Claim 100 G$
+                    </button>
+                </div>
+            </div>
+
+            <button onclick="closeDailyTaskModal()" class="btn-secondary" style="margin-top: 1rem; padding: 0.75rem; font-size: 0.95rem; cursor: pointer; touch-action: manipulation; width: 100%;">
+                Cancel
+            </button>
+        </div>
+    </div>
+
+    <!-- Daily Task History Modal -->
+    <div id="dailyTaskHistoryModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); z-index: 10000; align-items: center; justify-content: center; overflow-y: auto; padding: 1rem;">
+        <div class="modal-content" style="max-width: 600px; width: 100%; max-height: 90vh; overflow-y: auto; margin: auto;">
+            <h3 style="margin-bottom: 1rem; font-size: 1.8rem; font-weight: 700; color: #f1f5f9; display: flex; align-items: center; justify-content: space-between;">
+                📋 Daily Task History
+                <button onclick="closeDailyTaskHistoryModal()" class="notification-close" style="position: static; margin: 0; background: rgba(255,255,255,0.1);">×</button>
+            </h3>
+            <div class="history-stats" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1.5rem;">
+                <div class="stat-card-history" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 16px; padding: 1.5rem; text-align: center;">
+                    <div class="stat-title-history" style="font-size: 0.9rem; font-weight: 600; color: rgba(241, 245, 249, 0.7); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Total Earned</div>
+                    <div class="stat-value-history" style="font-size: 2rem; font-weight: 800; color: #f1f5f9; letter-spacing: -0.5px;" id="dailyHistoryTotalEarned">0 G$</div>
+                </div>
+                <div class="stat-card-history" style="background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 16px; padding: 1.5rem; text-align: center;">
+                    <div class="stat-title-history" style="font-size: 0.9rem; font-weight: 600; color: rgba(241, 245, 249, 0.7); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 0.5rem;">Total Claims</div>
+                    <div class="stat-value-history" style="font-size: 2rem; font-weight: 800; color: #f1f5f9; letter-spacing: -0.5px;" id="dailyHistoryTotalClaims">0</div>
+                </div>
+            </div>
+            <div id="dailyTaskHistoryList" style="margin-top: 1.5rem;">
+                <!-- Transaction history will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Unified Inbox Modal -->
+    <div id="unifiedInboxModal" class="inbox-modal">
+        <div class="inbox-content">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.8rem; font-weight: 700; color: #f1f5f9;">📬 Unified Inbox</h2>
+                <button onclick="closeInboxModal()" class="notification-close" style="position: static; margin: 0; background: rgba(255,255,255,0.1);">×</button>
+            </div>
+
+            <div style="display: flex; gap: 1rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <button onclick="filterInbox('all')" class="btn btn-primary" id="filterAll" style="flex: 1; min-width: 120px;">All</button>
+                <button onclick="filterInbox('broadcast')" class="btn btn-secondary" id="filterBroadcast" style="flex: 1; min-width: 120px;">📢 Broadcasts</button>
+                <button onclick="filterInbox('rewards')" class="btn btn-secondary" id="filterRewards" style="flex: 1; min-width: 120px;">💰 Rewards</button>
+                <button onclick="filterInbox('unread')" class="btn btn-secondary" id="filterUnread" style="flex: 1; min-width: 120px;">🔔 Unread</button>
+            </div>
+
+            <div id="inboxList" style="min-height: 300px;">
+                <div class="loading-spinner"></div>
+            </div>
+        </div>
+    </div>
+
+
+
+
+    <script>
+        const walletAddress = "{{ wallet }}";
+        let userCustomMessage = ""; // This will now hold the custom message
+        let selectedPlatform = null; // 'twitter' or 'telegram'
+        let countdownInterval = null; // Interval for the countdown timer
+
+        // Cache for API responses
+        const apiCache = {
+            dailyTasks: { data: null, timestamp: 0 },
+            communityScreenshots: { data: null, timestamp: 0 }
+        };
+        const CACHE_DURATION = 60000; // 1 minute cache
+
+        // Daily Task Modal Functions - Make it globally accessible
+        window.showDailyTaskModal = function() {
+            console.log('🎯 DAILY TASK MODAL FUNCTION CALLED!');
+            const modal = document.getElementById('dailyTaskModal');
+            if (modal) {
+                modal.style.display = 'flex';
+                // Reset to platform selection
+                document.getElementById('platformSelection').style.display = 'block';
+                document.getElementById('taskSubmissionForm').style.display = 'none';
+                selectedPlatform = null;
+                // Clear any existing countdown
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            } else {
+                console.error('❌ Modal element not found!');
+                showNotification('Error: Modal not found. Please refresh the page.', 'error');
+            }
+        };
+
+        function selectPlatform(platform) {
+            selectedPlatform = platform;
+            console.log('📱 Selected platform:', platform);
+
+            // Hide platform selection, show submission form
+            document.getElementById('platformSelection').style.display = 'none';
+            document.getElementById('taskSubmissionForm').style.display = 'block';
+
+            // Update labels
+            let platformName, platformIcon;
+            if (platform === 'twitter') {
+                platformName = 'Twitter/X';
+                platformIcon = '🐦';
+            } else if (platform === 'telegram') {
+                platformName = 'Telegram';
+                platformIcon = '📱';
+            } else if (platform === 'facebook') {
+                platformName = 'Facebook';
+                platformIcon = '📘';
+            }
+
+            document.getElementById('selectedPlatformName').textContent = platformName;
+            document.getElementById('platformUrlLabel').textContent = platformName;
+
+            // Update placeholder
+            const urlInput = document.getElementById('taskUrlInput');
+            if (platform === 'twitter') {
+                urlInput.placeholder = 'https://twitter.com/user/status/123456';
+            } else if (platform === 'telegram') {
+                urlInput.placeholder = 'https://t.me/GoodDollarX/123456';
+            } else if (platform === 'facebook') {
+                urlInput.placeholder = 'https://www.facebook.com/user/posts/123456';
+            }
+
+            // Load appropriate message
+            loadTaskMessage(platform);
+        }
+
+        function goBackToPlatformSelection() {
+            document.getElementById('platformSelection').style.display = 'block';
+            document.getElementById('taskSubmissionForm').style.display = 'none';
+            selectedPlatform = null;
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+
+        function closeDailyTaskModal() {
+            document.getElementById('dailyTaskModal').style.display = 'none';
+            const urlInput = document.getElementById('taskUrlInput');
+            if (urlInput) {
+                urlInput.value = '';
+            }
+            selectedPlatform = null;
+            // Clear any existing countdown
+            if (countdownInterval) {
+                clearInterval(countdownInterval);
+                countdownInterval = null;
+            }
+        }
+
+        async function loadTaskMessage(platform) {
+            const messageDisplay = document.getElementById('taskMessageDisplay');
+
+            if (!messageDisplay) {
+                console.error('❌ Message display element not found!');
+                return;
+            }
+
+            messageDisplay.innerHTML = '<div class="loading-spinner"></div>';
+
+            try {
+                let endpoint;
+                if (platform === 'twitter') {
+                    endpoint = '/api/twitter-task/custom-message';
+                } else if (platform === 'telegram') {
+                    endpoint = '/api/telegram-task/custom-message';
+                } else if (platform === 'facebook') {
+                    endpoint = '/api/facebook-task/custom-message';
+                }
+
+                const response = await fetch(endpoint);
+                const result = await response.json();
+
+                if (result.success) {
+                    userCustomMessage = result.custom_message;
+                    messageDisplay.innerHTML = `<p style="margin: 0; white-space: pre-wrap; line-height: 1.6;">${userCustomMessage}</p>`;
+                } else {
+                    messageDisplay.innerHTML = '<p style="color: #ef4444;">Error loading message. Please try again.</p>';
+                    showNotification('⚠️ Could not load message. Please refresh the page.', 'error');
+                }
+            } catch (error) {
+                console.error('❌ Error loading message:', error);
+                messageDisplay.innerHTML = '<p style="color: #ef4444;">Network error. Please check your connection and try again.</p>';
+                showNotification('❌ Network error loading message. Please try again.', 'error');
+            }
+        }
+
+        function copyTaskMessage() {
+            if (!userCustomMessage) {
+                showNotification('⚠️ Message not loaded yet. Please wait and try again.', 'error');
+                return;
+            }
+
+            navigator.clipboard.writeText(userCustomMessage).then(() => {
+                showNotification('✅ Message copied to clipboard!', 'success');
+            }).catch(err => {
+                const textArea = document.createElement("textarea");
+                textArea.value = userCustomMessage;
+                textArea.style.position = "fixed";
+                textArea.style.opacity = "0";
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showNotification('✅ Message copied to clipboard!', 'success');
+                } catch (e) {
+                    showNotification('❌ Failed to copy message. Please copy it manually.', 'error');
+                }
+                document.body.removeChild(textArea);
+            });
+        }
+
+        async function submitDailyTask(event) {
+            if (!selectedPlatform) {
+                showNotification('⚠️ Please select a platform first', 'error');
+                return;
+            }
+
+            const taskUrl = document.getElementById('taskUrlInput').value.trim();
+            const submitBtn = event.target;
+            const originalBtnText = submitBtn.textContent;
+
+            if (!taskUrl) {
+                showNotification(`⚠️ Please enter your ${selectedPlatform === 'twitter' ? 'Twitter' : 'Telegram'} post URL`, 'error');
+                return;
+            }
+
+            // Validate URL format
+            if (selectedPlatform === 'twitter') {
+                if (!taskUrl.startsWith('https://twitter.com/') && !taskUrl.startsWith('https://x.com/')) {
+                    showNotification('⚠️ Please enter a valid Twitter post URL', 'error');
+                    return;
+                }
+            } else if (selectedPlatform === 'telegram') {
+                if (!taskUrl.startsWith('https://t.me/')) {
+                    showNotification('⚠️ Please enter a valid Telegram post URL', 'error');
+                    return;
+                }
+            } else if (selectedPlatform === 'facebook') {
+                if (!taskUrl.startsWith('https://www.facebook.com/') && !taskUrl.startsWith('https://facebook.com/') && !taskUrl.startsWith('https://m.facebook.com/') && !taskUrl.startsWith('https://fb.com/')) {
+                    showNotification('⚠️ Please enter a valid Facebook post URL', 'error');
+                    return;
+                }
+            }
+
+            try {
+                submitBtn.disabled = true;
+                submitBtn.textContent = '⏳ Verifying...';
+
+                const endpoint = `/api/daily-task/claim`;
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        platform: selectedPlatform,
+                        post_url: taskUrl
+                    })
+                });
+
+                const result = await response.json();
+
+                if (result.success) {
+                    if (result.pending) {
+                        // Submission is pending approval
+                        const platformDisplayName = selectedPlatform === 'twitter' ? 'Twitter' : selectedPlatform === 'telegram' ? 'Telegram' : 'Facebook';
+                        showNotification(`✅ Submission successful! Your ${platformDisplayName} post is waiting for admin approval.`, 'success');
+                        closeDailyTaskModal();
+
+                        // IMMEDIATELY update UI to show "Under Review" status - no API call delay
+                        // Use lowercase selectedPlatform to match backend schema
+                        const immediateStatusData = {
+                            has_pending_submission: true,
+                            pending_platform: selectedPlatform,  // lowercase to match backend
+                            can_claim: false,
+                            show_claim_button: false,
+                            status_message: `Your ${platformDisplayName} submission is under review. You can only submit to ONE platform per day.`
+                        };
+                        updateDailyTaskUI(immediateStatusData);
+
+                        // Also refresh from API in background to sync any server-side changes
+                        checkDailyTaskStatus().then(updateDailyTaskUI);
+                    } else {
+                        // Immediate approval (if implemented)
+                        showNotification(`🎉 Successfully earned 100 G$ from ${selectedPlatform === 'twitter' ? 'Twitter' : 'Telegram'} task!`, 'success');
+                        closeDailyTaskModal();
+                        await loadDashboardData();
+                        await updateTotalEarned();
+                    }
+                } else {
+                    const errorMsg = result.error || result.message || 'Failed to claim task';
+                    showNotification(`❌ ${errorMsg}`, 'error');
+
+                    // Close modal and update status if cooldown is active
+                    if (result.next_claim_time && result.time_remaining_seconds !== undefined) {
+                        closeDailyTaskModal();
+                        // Reload to show updated cooldown timer
+                        const statusData = await checkDailyTaskStatus();
+                        updateDailyTaskUI(statusData);
+                    }
+                }
+            } catch (error) {
+                console.error('❌ Daily task error:', error);
+                showNotification('❌ Network error. Please check your connection and try again.', 'error');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalBtnText;
+            }
+        }
+
+        // Function to start the countdown timer with live updates
+        function startCountdown(nextClaimTimeIso, initialSecondsRemaining, isPending = false) {
+            const descElement = document.getElementById('dailyTaskDesc');
+            const claimBtn = document.getElementById('claimDailyTaskBtn');
+            const actionDescElement = document.getElementById('dailyTaskActionDesc');
+
+            if (countdownInterval) clearInterval(countdownInterval); // Clear existing interval
+
+            let secondsRemaining = initialSecondsRemaining;
+
+            const updateCountdown = () => {
+                if (secondsRemaining <= 0) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                    // Re-fetch status to enable claim button
+                    checkDailyTaskStatus().then(updateDailyTaskUI);
+                    return;
+                }
+
+                const hours = Math.floor(secondsRemaining / 3600);
+                const minutes = Math.floor((secondsRemaining % 3600) / 60);
+                const seconds = secondsRemaining % 60;
+
+                // Format with leading zeros for better display
+                const formattedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+                if (descElement) {
+                    if (isPending) {
+                        // Show "under review" message with countdown
+                        descElement.innerHTML = `<span style="color: #fbbf24; font-weight: 600;">⏳ Under Review</span><br>Next claim available in <strong style="color: #6366f1; font-size: 1.05em;">${formattedTime}</strong>`;
+                    } else {
+                        // Show regular countdown for completed claims
+                        descElement.innerHTML = `⏰ Next claim in <strong style="color: #6366f1; font-size: 1.1em;">${formattedTime}</strong>`;
+                    }
+                }
+                if (claimBtn) {
+                    claimBtn.disabled = true;
+                    if (isPending) {
+                        claimBtn.textContent = 'Pending Approval ⏳';
+                        claimBtn.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+                    } else {
+                        claimBtn.textContent = 'Claimed ✓';
+                        claimBtn.style.background = 'linear-gradient(135deg, #6b7280, #4b5563)';
+                    }
+                }
+                if (actionDescElement) {
+                    if (isPending) {
+                        actionDescElement.textContent = `Under review - Next in ${formattedTime}`;
+                    } else {
+                        actionDescElement.textContent = `Next claim in ${formattedTime}`;
+                    }
+                }
+
+                secondsRemaining--;
+            };
+
+            updateCountdown(); // Initial call
+            countdownInterval = setInterval(updateCountdown, 1000); // Update every second
+        }
+
+        // Update balance display
+        async function loadGoodDollarBalance() {
+            try {
+                const response = await fetch('/api/gooddollar-balance');
+                const data = await response.json();
+
+                console.log("Balance API Raw Response:", JSON.stringify(data, null, 2));
+                console.log("Balance API Parsed Data:", data);
+
+                if (data.success) {
+                    const balanceElement = document.getElementById('gdBalance');
+                    balanceElement.textContent = data.balance_formatted || `${parseFloat(data.balance).toFixed(2)} G$`;
+
+                    console.log("Updating Balance Display with:", data);
+                } else {
+                    document.getElementById('gdBalance').textContent = 'Error loading';
+                    console.error("Balance API returned error:", data.error);
+                }
+            } catch (error) {
+                console.error('Error fetching balance:', error);
+                document.getElementById('gdBalance').textContent = 'Error';
+            }
+        }
+
+        // Update total earned from all sources
+        async function updateTotalEarned() {
+            try {
+                console.log("📊 Fetching total earned from all sources...");
+
+                // Fetch from all earning sources in parallel
+                const [learnEarnResponse, telegramTaskResponse, twitterTaskResponse] = await Promise.all([
+                    fetch('/learn-earn/quiz-history?limit=1000').catch(() => ({ ok: false, json: async () => ({success: false}) })),
+                    fetch('/api/daily-task/history?limit=1000').catch(() => ({ ok: false, json: async () => ({success: false}) })),
+                    fetch('/api/twitter-task/transaction-history?limit=1000').catch(() => ({ ok: false, json: async () => ({success: false}) }))
+                ]);
+
+                // Handle potential non-JSON responses or errors
+                const learnEarnData = await learnEarnResponse.json();
+                const telegramTaskData = await telegramTaskResponse.json();
+                const twitterTaskData = await twitterTaskResponse.json();
+
+                console.log("Learn & Earn Data:", learnEarnData);
+                console.log("Telegram Task Data:", telegramTaskData);
+                console.log("Twitter Task Data:", twitterTaskData);
+
+                let totalEarned = 0;
+
+                // Calculate Learn & Earn total
+                if (learnEarnData.success && learnEarnData.quiz_history) {
+                    const learnEarnTotal = learnEarnData.quiz_history.reduce((sum, quiz) => {
+                        return sum + parseFloat(quiz.amount_g$ || 0);
+                    }, 0);
+                    totalEarned += learnEarnTotal;
+                    console.log("Learn & Earn Total:", learnEarnTotal);
+                }
+
+                // Calculate Telegram Task total
+                if (telegramTaskData.success && telegramTaskData.transactions) {
+                    const telegramTotal = telegramTaskData.transactions.reduce((sum, tx) => {
+                        return sum + parseFloat(tx.reward_amount || 0);
+                    }, 0);
+                    totalEarned += telegramTotal;
+                    console.log("Telegram Task Total:", telegramTotal);
+                }
+
+                // Calculate Twitter Task total
+                if (twitterTaskData.success && twitterTaskData.transactions) {
+                    const twitterTotal = twitterTaskData.transactions.reduce((sum, tx) => {
+                        return sum + parseFloat(tx.reward_amount || 0);
+                    }, 0);
+                    totalEarned += twitterTotal;
+                    console.log("Twitter Task Total:", twitterTotal);
+                }
+
+                console.log("✅ Total Earned Calculated:", totalEarned, "G$");
+
+                // Update the display
+                const totalEarnedElement = document.getElementById('totalEarned');
+                totalEarnedElement.textContent = `${totalEarned.toFixed(2)} G$`;
+
+            } catch (error) {
+                console.error('❌ Error fetching total earned:', error);
+                document.getElementById('totalEarned').textContent = 'Error loading';
+            }
+        }
+
+        async function loadDashboardData() {
+            try {
+                console.log('🔄 Loading dashboard data...');
+
+                // Load balance, daily task, and total earned in parallel for speed
+                const [balanceRes, dailyTaskRes, totalEarnedRes] = await Promise.all([
+                    fetch('/api/gooddollar-balance').catch(() => ({ ok: false, json: async () => ({}) })),
+                    fetch('/api/daily-task/status').catch(() => ({ ok: false, json: async () => ({}) })),
+                    fetch('/api/total-earned').catch(() => ({ ok: false, json: async () => ({}) }))
+                ]);
+
+                // Process balance
+                if (balanceRes.ok) {
+                    const balanceData = await balanceRes.json();
+                    if (balanceData.balance_formatted) {
+                        const balanceEl = document.getElementById('gdBalance');
+                        if (balanceEl) balanceEl.textContent = balanceData.balance_formatted;
+                    }
+                } else {
+                    document.getElementById('gdBalance').textContent = 'Error loading';
+                }
+
+                // Process daily task - CRITICAL: Always update UI
+                if (dailyTaskRes.ok) {
+                    const dailyTaskData = await dailyTaskRes.json();
+                    console.log('📊 Daily Task Status Data:', dailyTaskData);
+                    updateDailyTaskUI(dailyTaskData);
+                } else {
+                    console.error('❌ Failed to load daily task status');
+                    // Show button anyway on error
+                    const claimBtn = document.getElementById('claimDailyTaskBtn');
+                    if (claimBtn) {
+                        claimBtn.style.display = 'block';
+                        claimBtn.disabled = false;
+                    }
+                }
+
+                // Process total earned (if the specific /api/total-earned endpoint is used)
+                if (totalEarnedRes.ok) {
+                    const totalEarnedData = await totalEarnedRes.json();
+                    if (totalEarnedData.success && totalEarnedData.total_earned_formatted) {
+                        const totalEl = document.getElementById('totalEarned');
+                        if (totalEl) totalEl.textContent = totalEarnedData.total_earned_formatted;
+                        console.log(`✅ Total Earned (from /api/total-earned): ${totalEarnedData.total_earned_formatted}`);
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                // Set defaults in case of error
+                document.getElementById('gdBalance').textContent = 'Error';
+                document.getElementById('totalEarned').textContent = '0.00 G$';
+
+                // Show button anyway on error
+                const claimBtn = document.getElementById('claimDailyTaskBtn');
+                if (claimBtn) {
+                    claimBtn.style.display = 'block';
+                    claimBtn.disabled = false;
+                }
+            }
+        }
+
+        function updateDailyTaskUI(statusData) {
+            const statusElement = document.getElementById('dailyTaskStatus');
+            const descElement = document.getElementById('dailyTaskDesc');
+            const actionDescElement = document.getElementById('dailyTaskActionDesc');
+            const claimBtn = document.getElementById('claimDailyTaskBtn');
+            const pendingAlert = document.getElementById('dailyTaskPendingAlert');
+
+            if (!statusElement || !descElement || !claimBtn) {
+                console.error('❌ Daily task UI elements not found');
+                return;
+            }
+
+            console.log('🔍 Updating Daily Task UI with:', statusData);
+
+            if (statusData.has_pending_submission) {
+                // FIXED: Show "Under Review" and HIDE claim button
+                statusElement.innerHTML = '<span style="color: #f59e0b; font-weight: 600;">⏳ Under Review</span>';
+                descElement.textContent = statusData.status_message || `Your ${statusData.pending_platform} submission is under review`;
+
+                // HIDE CLAIM BUTTON - user cannot submit to other platform
+                claimBtn.disabled = true;
+                claimBtn.style.opacity = '0.5';
+                claimBtn.style.cursor = 'not-allowed';
+                claimBtn.style.display = 'block';
+                claimBtn.textContent = 'Pending Approval ⏳';
+                claimBtn.style.background = 'linear-gradient(135deg, #fbbf24, #f59e0b)';
+
+                // Show pending alert
+                if (pendingAlert) {
+                    pendingAlert.style.display = 'block';
+                    pendingAlert.innerHTML = `
+                        <strong>⏳ Submission Under Review</strong><br>
+                        Your ${statusData.pending_platform} post is waiting for admin approval.<br>
+                        <strong>You can only submit to ONE platform per day.</strong>
+                    `;
+                }
+
+                // Clear any existing countdown
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            } else if (!statusData.can_claim) {
+                // Cooldown active
+                statusElement.innerHTML = '<span style="color: #ef4444; font-weight: 600;">🔒 On Cooldown</span>';
+
+                if (pendingAlert) {
+                    pendingAlert.style.display = 'none';
+                }
+
+                claimBtn.disabled = true;
+                claimBtn.style.opacity = '0.5';
+                claimBtn.style.cursor = 'not-allowed';
+                claimBtn.style.display = 'block'; // CRITICAL: Always show button
+
+                if (statusData.next_claim_time && statusData.time_remaining_seconds !== undefined && statusData.time_remaining_seconds > 0) {
+                    startCountdown(statusData.next_claim_time, statusData.time_remaining_seconds, false);
+                } else {
+                    descElement.textContent = 'Already claimed today - come back tomorrow';
+                }
+            } else {
+                // Can claim - SHOW BUTTON!
+                console.log('✅ User CAN CLAIM - showing button!');
+                statusElement.innerHTML = '<span style="color: #10b981; font-weight: 600;">✅ Available</span>';
+                descElement.textContent = 'Claim your 100 G$ daily reward now!';
+
+                // CRITICAL FIX: Force button to be visible and enabled
+                claimBtn.disabled = false;
+                claimBtn.style.opacity = '1';
+                claimBtn.style.cursor = 'pointer';
+                claimBtn.style.display = 'block'; // FORCE DISPLAY
+                claimBtn.style.pointerEvents = 'auto'; // Ensure clickable
+                claimBtn.textContent = '🎁 Claim 100 G$'; // Reset text
+
+                if (pendingAlert) {
+                    pendingAlert.style.display = 'none';
+                }
+
+                if (countdownInterval) {
+                    clearInterval(countdownInterval);
+                    countdownInterval = null;
+                }
+            }
+        }
+
+        // Function to check and update daily task status, returns data for UI update
+        async function checkDailyTaskStatus() {
+            try {
+                const response = await fetch('/api/daily-task/status');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                const data = await response.json();
+                console.log('✅ Daily Task Status:', data);
+
+                // FIXED: Do NOT allow claim button when there's a pending submission
+                // User should only be able to submit to ONE platform per day
+                if (data.has_pending_submission) {
+                    data.show_claim_button = false;  // Hide button - cannot submit to other platforms
+                    data.pending_message = `Your ${data.pending_platform} submission is under review. You can only submit to ONE platform per day.`;
+                }
+
+                return data;
+            } catch (error) {
+                console.error('❌ Error fetching daily task status:', error);
+                return { can_claim: false, has_pending_submission: false }; // Default to unavailable state
+            }
+        }
+
+        function showNotification(message, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'notification-toast';
+
+            const icon = type === 'success' ? '✅' : type === 'error' ? '❌' : 'ℹ️';
+
+            toast.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-icon">${icon}</div>
+                    <div class="notification-text">
+                        <div class="notification-message">${message}</div>
+                    </div>
+                    <button class="notification-close" onclick="this.parentElement.parentElement.remove()">×</button>
+                </div>
+            `;
+
+            document.body.appendChild(toast);
+
+            setTimeout(() => {
+                if (toast.parentNode) {
+                    toast.remove();
+                }
+            }, 5000);
+        }
+
+
+
+        // Service Worker registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/static/service-worker.js')
+                    .then(registration => {
+                        console.log('✅ Service Worker registered successfully');
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000);
+                    })
+                    .catch(err => console.error('❌ Service Worker registration failed:', err));
+            });
+
+            navigator.serviceWorker.addEventListener('message', (event) => {
+                console.log('📨 Dashboard received SW message:', event.data);
+                if (event.data.type === 'SW_UPDATED') {
+                    showNotification('🎉 New version available! Refresh to update.', 'info');
+                }
+            });
+        }
+
+        // Unified Inbox Functions
+        let currentInboxFilter = 'all';
+        let allInboxNotifications = [];
+        let inboxPollingInterval = null;
+        let isLoadingInbox = false;
+
+        async function openInboxModal() {
+            document.getElementById('unifiedInboxModal').style.display = 'flex';
+            await loadUnifiedInbox(true); // Show loading on first load
+            // Start polling for new notifications every 30 seconds (optimized)
+            if (inboxPollingInterval) clearInterval(inboxPollingInterval);
+            inboxPollingInterval = setInterval(() => loadUnifiedInbox(false), 30000);
+        }
+
+        function closeInboxModal() {
+            document.getElementById('unifiedInboxModal').style.display = 'none';
+            if (inboxPollingInterval) {
+                clearInterval(inboxPollingInterval);
+                inboxPollingInterval = null;
+            }
+        }
+
+        async function loadUnifiedInbox(showLoading = false) {
+            // Prevent multiple simultaneous requests
+            if (isLoadingInbox) return;
+
+            isLoadingInbox = true;
+            const inboxList = document.getElementById('inboxList');
+
+            try {
+                // Show loading state only on initial load
+                if (showLoading) {
+                    inboxList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: rgba(241, 245, 249, 0.6);">
+                            <div class="spinner" style="margin: 0 auto 16px; width: 40px; height: 40px; border-width: 3px;"></div>
+                            <div>Loading notifications...</div>
+                        </div>
+                    `;
+                }
+
+                const response = await fetch('/api/notifications?limit=100');
+                const data = await response.json();
+
+                if (data.success) {
+                    allInboxNotifications = data.notifications;
+                    displayInboxNotifications(currentInboxFilter);
+
+                    // Update badge
+                    const badge = document.getElementById('inboxBadge');
+                    if (data.unread_count > 0) {
+                        badge.textContent = data.unread_count;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+
+                    // Check for broadcast messages with voice
+                    if (data.has_broadcast) {
+                        const broadcastMsg = allInboxNotifications.find(n => n.type === 'admin_broadcast' && !n.read);
+                        if (broadcastMsg && broadcastMsg.voice_message) {
+                            playVoiceMessage(broadcastMsg.voice_message);
+                        }
+                    }
+                } else {
+                    // Show error message if fetch was ok but data.success is false
+                    if (showLoading) {
+                        inboxList.innerHTML = `
+                            <div style="text-align: center; padding: 40px; color: #ef4444;">
+                                <div style="font-size: 2rem; margin-bottom: 16px;">⚠️</div>
+                                <div>${data.message || 'Failed to load notifications'}</div>
+                                <button onclick="loadUnifiedInbox(true)" style="margin-top: 16px; padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                    Retry
+                                </button>
+                            </div>
+                        `;
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading inbox:', error);
+                if (showLoading) {
+                    inboxList.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: #ef4444;">
+                            <div style="font-size: 2rem; margin-bottom: 16px;">⚠️</div>
+                            <div>Failed to load notifications</div>
+                            <button onclick="loadUnifiedInbox(true)" style="margin-top: 16px; padding: 8px 16px; background: #6366f1; color: white; border: none; border-radius: 8px; cursor: pointer;">
+                                Retry
+                            </button>
+                        </div>
+                    `;
+                }
+            } finally {
+                isLoadingInbox = false;
+            }
+        }
+
+        function filterInbox(filter) {
+            currentInboxFilter = filter;
+
+            // Update button states
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.classList.remove('btn-primary');
+                btn.classList.add('btn-secondary');
+            });
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.remove('btn-secondary');
+            document.getElementById('filter' + filter.charAt(0).toUpperCase() + filter.slice(1)).classList.add('btn-primary');
+
+            displayInboxNotifications(filter);
+        }
+
+        function makeLinksClickable(text) {
+            // Convert URLs to clickable links
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            return text.replace(urlRegex, '<a href="$1" target="_blank" style="color: #6366f1; text-decoration: underline; word-break: break-all;" onclick="event.stopPropagation();">$1</a>');
+        }
+
+        function displayInboxNotifications(filter) {
+            const inboxList = document.getElementById('inboxList');
+            let notifications = allInboxNotifications;
+
+            // Apply filter
+            if (filter === 'broadcast') {
+                notifications = notifications.filter(n => n.type === 'admin_broadcast');
+            } else if (filter === 'rewards') {
+                notifications = notifications.filter(n => n.type !== 'admin_broadcast');
+            } else if (filter === 'unread') {
+                notifications = notifications.filter(n => !n.read);
+            }
+
+            if (notifications.length === 0) {
+                inboxList.innerHTML = '<p style="text-align: center; color: rgba(241, 245, 249, 0.6); padding: 2rem;">No notifications</p>';
+                return;
+            }
+
+            let html = '';
+            notifications.forEach(notif => {
+                const unreadClass = !notif.read ? 'unread' : '';
+                const broadcastClass = notif.type === 'admin_broadcast' ? 'broadcast' : '';
+                const icon = notif.icon || '📬';
+                const date = new Date(notif.timestamp).toLocaleString();
+
+                // Make URLs in message clickable
+                const messageWithLinks = makeLinksClickable(notif.message || '');
+
+                html += `
+                    <div class="inbox-item ${unreadClass} ${broadcastClass}" onclick="markAsRead('${notif.id}', ${!notif.read})">
+                        <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.5rem;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.5rem;">${icon}</span>
+                                <div>
+                                    <div style="font-weight: 700; color: #f1f5f9;">${notif.title}${!notif.read ? ' <span style="color: #ef4444; font-size: 0.75rem;">●</span>' : ''}</div>
+                                    <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.6);">${date}</div>
+                                </div>
+                            </div>
+                            ${notif.has_voice ? `<div class="voice-indicator" onclick="event.stopPropagation(); playVoiceMessage('${notif.voice_message}')">🔊 Play</div>` : ''}
+                        </div>
+                        <div style="color: rgba(241, 245, 249, 0.8); line-height: 1.5; word-wrap: break-word;">
+                            ${messageWithLinks}
+                        </div>
+                        ${notif.amount ? `<div style="margin-top: 0.5rem; font-size: 1.1rem; font-weight: 700; color: #10b981;">+${notif.amount} G$</div>` : ''}
+                        ${notif.transaction_hash ? `<div style="margin-top: 0.5rem;"><a href="https://explorer.celo.org/mainnet/tx/${notif.transaction_hash}" target="_blank" style="color: #6366f1; font-size: 0.85rem;" onclick="event.stopPropagation();">View Transaction →</a></div>` : ''}
+                    </div>
+                `;
+            });
+
+            // Show empty state if no notifications
+            if (html === '') {
+                inboxList.innerHTML = `
+                    <div style="text-align: center; padding: 60px 20px; color: rgba(241, 245, 249, 0.5);">
+                        <div style="font-size: 3rem; margin-bottom: 16px;">📭</div>
+                        <div style="font-size: 1.2rem; font-weight: 600; margin-bottom: 8px;">No notifications</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">You're all caught up!</div>
+                    </div>
+                `;
+            } else {
+                inboxList.innerHTML = html;
+            }
+        }
+
+        async function markAsRead(notificationId, wasUnread) {
+            // Only mark as read if it was unread
+            if (!wasUnread) {
+                return;
+            }
+
+            try {
+                const response = await fetch('/api/notifications/mark-read', {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({notification_ids: [notificationId]})
+                });
+
+                if (response.ok) {
+                    // Update the notification in the local array
+                    const notif = allInboxNotifications.find(n => n.id === notificationId);
+                    if (notif) {
+                        notif.read = true;
+                    }
+
+                    // Update badge count immediately
+                    const badge = document.getElementById('inboxBadge');
+                    const unreadCount = allInboxNotifications.filter(n => !n.read).length;
+
+                    if (unreadCount > 0) {
+                        badge.textContent = unreadCount;
+                        badge.style.display = 'flex';
+                    } else {
+                        badge.style.display = 'none';
+                    }
+
+                    // Refresh display with current filter
+                    displayInboxNotifications(currentInboxFilter);
+
+                    console.log(`✅ Marked notification ${notificationId} as read. Unread count: ${unreadCount}`);
+                } else {
+                    console.error(`Failed to mark notification ${notificationId} as read. Status: ${response.status}`);
+                }
+            } catch (error) {
+                console.error('Error marking as read:', error);
+            }
+        }
+
+        function playVoiceMessage(text) {
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel(); // Stop any playing
+                const utterance = new SpeechSynthesisUtterance(text);
+                utterance.rate = 0.9;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+                utterance.lang = 'en-US';
+                window.speechSynthesis.speak(utterance);
+                showNotification('🔊 Playing voice message...', 'info');
+            } else {
+                showNotification('Voice messages not supported in this browser', 'error');
+            }
+        }
+
+        // Check for notifications on page load
+        async function checkForNotifications() {
+            try {
+                const response = await fetch('/api/notifications?limit=10');
+                if (!response.ok) {
+                    console.error("Failed to fetch notifications:", response.status);
+                    return;
+                }
+                const data = await response.json();
+
+                if (data.success && data.unread_count > 0) {
+                    const badge = document.getElementById('inboxBadge');
+                    badge.textContent = data.unread_count;
+                    badge.style.display = 'flex';
+
+                    // Auto-play broadcast messages
+                    if (data.has_broadcast) {
+                        // Find the first unread broadcast message with voice
+                        const broadcastMsg = data.notifications.find(n => n.type === 'admin_broadcast' && !n.read && n.voice_message);
+                        if (broadcastMsg) {
+                            // Show a general notification first
+                            showNotification(`📢 ${broadcastMsg.title}: ${broadcastMsg.message}`, 'info');
+                            // Play voice message after a short delay
+                            setTimeout(() => playVoiceMessage(broadcastMsg.voice_message), 1000);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Error checking notifications:', error);
+            }
+        }
+
+        // Daily Task History Modal Functions
+        window.showDailyTaskHistory = async function() {
+            console.log('📋 Opening Daily Task History modal...');
+
+            const modal = document.getElementById('dailyTaskHistoryModal');
+            const historyList = document.getElementById('dailyTaskHistoryList');
+
+            if (!modal || !historyList) {
+                console.error('❌ Daily Task History modal elements not found');
+                showNotification('Error loading history modal. Please refresh the page.', 'error');
+                return;
+            }
+
+            modal.style.display = 'flex';
+            historyList.innerHTML = '<div class="loading-spinner" style="margin: 2rem auto;"></div>';
+
+            try {
+                console.log('🔄 Fetching daily task history...');
+                const response = await fetch('/api/daily-task/history?limit=50');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                console.log('📊 History data received:', data);
+
+                if (data.success) {
+                    // Update stats
+                    const totalEarnedEl = document.getElementById('dailyHistoryTotalEarned');
+                    const totalClaimsEl = document.getElementById('dailyHistoryTotalClaims');
+
+                    if (totalEarnedEl) totalEarnedEl.textContent = `${data.total_earned.toFixed(2)} G$`;
+                    if (totalClaimsEl) totalClaimsEl.textContent = data.total_count;
+
+                    // Display transactions
+                    if (data.transactions && data.transactions.length > 0) {
+                        let historyListHtml = ''; // Renamed to avoid conflict
+
+                        data.transactions.forEach(tx => {
+                            let statusBadge = '';
+                            let platformIcon = '';
+                            let platformName = '';
+
+                            // Platform-specific styling
+                            if (tx.platform === 'twitter') {
+                                platformIcon = '🐦';
+                                platformName = 'Twitter';
+                            } else if (tx.platform === 'telegram') {
+                                platformIcon = '📱';
+                                platformName = 'Telegram';
+                            } else if (tx.platform === 'facebook') {
+                                platformIcon = '📘';
+                                platformName = 'Facebook';
+                            }
+
+                            // Status badge
+                            if (tx.status === 'completed') {
+                                statusBadge = '<span style="background: rgba(16, 185, 129, 0.2); color: #10b981; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">✅ Approved</span>';
+                            } else if (tx.status === 'pending') {
+                                statusBadge = '<span style="background: rgba(251, 191, 36, 0.2); color: #fbbf24; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">⏳ Pending</span>';
+                            } else if (tx.status === 'rejected') {
+                                statusBadge = '<span style="background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 0.3rem 0.6rem; border-radius: 6px; font-size: 0.8rem; font-weight: 600;">❌ Rejected</span>';
+                            }
+
+                            const explorerLink = tx.explorer_url ?
+                                `<a href="${tx.explorer_url}" target="_blank" style="color: #3b82f6; text-decoration: none; font-size: 0.75rem; display: inline-flex; align-items: center; gap: 0.25rem;">View TX ↗</a>` :
+                                '<span style="color: rgba(241, 245, 249, 0.5); font-size: 0.75rem;">-</span>';
+
+                            // Rejection reason (only show if rejected)
+                            const rejectionReason = tx.status === 'rejected' && tx.rejection_reason ?
+                                `<div style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(239, 68, 68, 0.1); border-left: 3px solid #ef4444; border-radius: 6px;">
+                                    <div style="font-size: 0.75rem; font-weight: 600; color: #ef4444; margin-bottom: 0.25rem; text-transform: uppercase; letter-spacing: 0.5px;">Rejection Reason:</div>
+                                    <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.9); line-height: 1.4;">${tx.rejection_reason}</div>
+                                </div>` : '';
+
+                            historyListHtml += `
+                                <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(99, 102, 241, 0.2); border-radius: 12px; padding: 1rem; margin-bottom: 1rem;">
+                                    <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 0.75rem;">
+                                        <div style="flex: 1;">
+                                            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                                                <span style="font-size: 1.2rem;">${platformIcon}</span>
+                                                <span style="font-weight: 700; color: #f1f5f9; font-size: 0.95rem;">${platformName}</span>
+                                                ${statusBadge}
+                                            </div>
+                                            <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.7);">
+                                                ${new Date(tx.created_at).toLocaleString()}
+                                            </div>
+                                        </div>
+                                        <div style="text-align: right;">
+                                            <div style="font-size: 1.2rem; font-weight: 800; color: ${tx.status === 'completed' ? '#10b981' : '#f1f5f9'}; margin-bottom: 0.25rem;">
+                                                ${tx.status === 'completed' ? '+' : ''}${tx.reward_amount} G$
+                                            </div>
+                                            ${explorerLink}
+                                        </div>
+                                    </div>
+                                    ${rejectionReason}
+                                </div>
+                            `;
+                        });
+
+                        historyList.innerHTML = historyListHtml; // Use the correct variable name
+                        console.log('✅ History displayed successfully');
+                    } else {
+                        historyList.innerHTML = `
+                            <div style="text-align: center; padding: 2rem; color: rgba(241, 245, 249, 0.6);">
+                                <div style="font-size: 3rem; margin-bottom: 1rem;">📭</div>
+                                <div>No transaction history yet</div>
+                                <div style="font-size: 0.9rem; margin-top: 0.5rem;">
+                                    Complete Twitter tasks to earn rewards!
+                                </div>
+                            </div>
+                        `;
+                        console.log('ℹ️ No history found');
+                    }
+                } else {
+                    throw new Error(data.error || 'Failed to load history');
+                }
+            } catch (error) {
+                console.error('❌ Error loading Twitter task history:', error);
+                historyList.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: #ef4444;">
+                        <div style="font-size: 2rem; margin-bottom: 0.5rem;">❌</div>
+                        <div>Failed to load transaction history</div>
+                        <div style="font-size: 0.9rem; margin-top: 0.5rem;">${error.message}</div>
+                    </div>
+                `;
+            }
+        };
+
+        window.closeDailyTaskHistoryModal = function() {
+            console.log('🚪 Closing Daily Task History modal');
+            const modal = document.getElementById('dailyTaskHistoryModal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        // Log to confirm functions are available
+        console.log('✅ Daily Task History functions initialized:', {
+            showHistory: typeof window.showDailyTaskHistory,
+            closeHistory: typeof window.closeDailyTaskHistoryModal
+        });
+
+        // Check for admin access and show admin link
+        async function checkAdminAccess() {
+            try {
+                const response = await fetch('/api/admin/check');
+                const data = await response.json();
+
+                if (data.success && data.is_admin) {
+                    const adminLink = document.getElementById('adminLink');
+                    if (adminLink) {
+                        adminLink.style.display = 'inline-block';
+                        console.log('✅ Admin access granted - showing admin link');
+                    }
+                }
+            } catch (error) {
+                console.log('Not an admin user');
+            }
+        }
+
+        // Transaction history has been removed - history modal still available through individual modules
+
+
+
+    </script>
+
+    <script>
+        // Auto-refresh recent submissions every 2 minutes (reduced frequency)
+        setInterval(loadRecentDailyTasks, 120000);
+
+        // Auto-refresh community screenshots every 3 minutes (reduced frequency)
+        setInterval(loadCommunityScreenshots, 180000);
+
+        async function loadRecentDailyTasks() {
+            try {
+                // Check cache first
+                const now = Date.now();
+                if (apiCache.dailyTasks.data && (now - apiCache.dailyTasks.timestamp) < CACHE_DURATION) {
+                    console.log('📦 Using cached daily tasks data');
+                    displayRecentDailyTasks(apiCache.dailyTasks.data);
+                    return;
+                }
+
+                console.log('🔍 Loading recent daily tasks...');
+                const response = await fetch('/api/recent-daily-tasks');
+                const contentType = response.headers.get("content-type");
+                console.log('API Content-Type:', contentType);
+
+                const data = await response.json();
+                console.log('API Data:', data);
+
+                // Cache the response
+                apiCache.dailyTasks = { data, timestamp: now };
+                displayRecentDailyTasks(data);
+            } catch (error) {
+                console.error('❌ Error loading recent daily tasks:', error);
+            }
+        }
+
+        function displayRecentDailyTasks(data) {
+            try {
+                const recentSubmissionsContainer = document.getElementById('recentSubmissions');
+                if (!recentSubmissionsContainer) {
+                    console.error('❌ Recent submissions container not found!');
+                    return;
+                }
+
+                if (data.success && data.submissions && data.submissions.length > 0) {
+                    const submissionsHtml = data.submissions.map(sub => `
+                        <div class="stat-card" style="background: rgba(255, 255, 255, 0.05); border-color: rgba(251, 191, 36, 0.3);">
+                            <div class="stat-header">
+                                <div>
+                                    <div class="stat-title">Submission by ${sub.username || 'Anonymous'}</div>
+                                </div>
+                                <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">🖼️</div>
+                            </div>
+                            <div class="stat-value" style="font-size: 1rem;">
+                                <a href="${sub.screenshot_url}" target="_blank" style="color: #f1f5f9; text-decoration: none; display: block; background: rgba(0,0,0,0.3); padding: 0.75rem; border-radius: 8px;">View Screenshot</a>
+                            </div>
+                            <div class="stat-description">${new Date(sub.created_at).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                    recentSubmissionsContainer.innerHTML = submissionsHtml;
+                } else {
+                    recentSubmissionsContainer.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: rgba(241, 245, 249, 0.5);">
+                            No recent submissions yet
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error displaying recent daily tasks:', error);
+            }
+        }
+
+
+        async function loadCommunityScreenshots() {
+            try {
+                // Check cache first
+                const now = Date.now();
+                if (apiCache.communityScreenshots.data && (now - apiCache.communityScreenshots.timestamp) < CACHE_DURATION) {
+                    console.log('📦 Using cached community screenshots data');
+                    displayCommunityScreenshots(apiCache.communityScreenshots.data);
+                    return;
+                }
+
+                console.log('📸 Loading community screenshots...');
+                const response = await fetch('/api/community-screenshots?limit=10');
+                const data = await response.json();
+                console.log('📸 Community Stories API Response:', data);
+
+                // Cache the response
+                apiCache.communityScreenshots = { data, timestamp: now };
+                displayCommunityScreenshots(data);
+            } catch (error) {
+                console.error('❌ Error loading community screenshots:', error);
+            }
+        }
+
+        function displayCommunityScreenshots(data) {
+            try {
+                const communityGrid = document.getElementById('communityGrid');
+                if (!communityGrid) {
+                    console.error('❌ Community grid not found!');
+                    return;
+                }
+
+                if (data.success && data.screenshots && data.screenshots.length > 0) {
+                    console.log('✅ Found', data.screenshots.length, 'screenshots');
+                    console.log('🔍 First screenshot:', data.screenshots[0]);
+                    const screenshotsHtml = data.screenshots.map(ss => `
+                        <div class="action-card" style="background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.4); padding: 1rem; cursor: default;">
+                            <img src="${ss.url}" alt="Community Screenshot" style="width: 100%; height: 150px; object-fit: cover; border-radius: 8px; margin-bottom: 0.75rem;">
+                            <div class="action-title" style="font-size: 0.9rem;">Shared by ${ss.username || 'Anonymous'}</div>
+                            <div class="action-description" style="font-size: 0.75rem; color: rgba(251, 191, 36, 0.8);">${new Date(ss.created_at).toLocaleString()}</div>
+                        </div>
+                    `).join('');
+                    communityGrid.innerHTML = screenshotsHtml;
+                } else {
+                    communityGrid.innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: rgba(241, 245, 249, 0.5); grid-column: 1 / -1;">
+                            No community stories yet
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error displaying community screenshots:', error);
+            }
+        }
+
+        // Initial load - prioritize critical data
+        loadGoodDollarBalance();
+        checkDailyTaskStatus().then(updateDailyTaskUI);
+        updateTotalEarned();
+
+        // Delay non-critical data by 1 second to improve initial load
+        setTimeout(() => {
+            loadRecentDailyTasks();
+            loadCommunityScreenshots();
+        }, 1000);
+
+        // Check for admin access and notifications on load
+        checkAdminAccess();
+        checkForNotifications();
+        // Set interval to check for new notifications periodically
+        setInterval(checkForNotifications, 30000);
+    </script>
+</body>
+</html>
