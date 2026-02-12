@@ -868,33 +868,14 @@
                 <button class="close-modal" onclick="closeWalletModal()">×</button>
             </div>
 
-            <div class="wallet-input-group">
-                <label class="wallet-label" for="walletAddress">GoodDollar Wallet Address</label>
-                <input
-                    type="text"
-                    id="walletAddress"
-                    class="wallet-input"
-                    placeholder="0x..."
-                    autocomplete="off"
-                />
-
-                <!-- MiniPay Instructions -->
-                <div style="margin-top: 1rem; padding: 1rem; background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px;">
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <span style="font-size: 1.2rem;">📱</span>
-                        <strong style="color: #6366f1;">MiniPay Users:</strong>
-                    </div>
-                    <ol style="margin: 0; padding-left: 1.5rem; color: #4b5563; font-size: 0.9rem; line-height: 1.6;">
-                        <li>Open your MiniPay app</li>
-                        <li>Tap on your profile or settings</li>
-                        <li>Find "Wallet Address" or "Account Address"</li>
-                        <li>Copy the address (starts with 0x...)</li>
-                        <li>Paste it above and connect</li>
-                    </ol>
-                    <p style="margin-top: 0.75rem; margin-bottom: 0; color: #6b7280; font-size: 0.85rem;">
-                        💡 Your MiniPay wallet works directly with GoodDollar on Celo network!
-                    </p>
+            <div class="wallet-input-group" style="background: linear-gradient(135deg, rgba(99, 102, 241, 0.1), rgba(168, 85, 247, 0.1)); border: 1px solid rgba(99, 102, 241, 0.3); border-radius: 12px; padding: 1rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.5rem;">
+                    <span style="font-size: 1.2rem;">🔐</span>
+                    <strong style="color: #6366f1;">Real WalletConnect Integration</strong>
                 </div>
+                <p style="margin: 0; color: #4b5563; font-size: 0.95rem; line-height: 1.6; text-align: left;">
+                    Hindi na kailangan mag-manual paste ng wallet address. Gagamit tayo ng WalletConnect modal para secure at direct ang wallet connection.
+                </p>
             </div>
 
             <div class="wallet-input-group">
@@ -908,15 +889,68 @@
                 />
             </div>
 
-            <button class="connect-btn" onclick="connectWallet()">
-                <span id="connectBtnText">Connect GoodDollar Wallet</span>
+            <button class="connect-btn" id="connectWalletBtn" onclick="connectWallet()">
+                <span id="connectBtnText">Connect via WalletConnect</span>
             </button>
 
             <div id="statusMessage" class="status-message"></div>
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/@reown/appkit-cdn@1.8.16/dist/appkit.min.js"></script>
+    <script src="https://unpkg.com/@walletconnect/ethereum-provider@2.21.1/dist/index.umd.js"></script>
     <script>
+        let WALLETCONNECT_PROJECT_ID = "";
+        let walletConnectProvider = null;
+
+        async function loadWalletConnectConfig() {
+            const response = await fetch('/wallet-connect/config');
+            const data = await response.json();
+
+            if (!data.success) {
+                throw new Error('Failed to load wallet connect config.');
+            }
+
+            WALLETCONNECT_PROJECT_ID = data.walletconnect?.project_id || "";
+            return data.walletconnect;
+        }
+
+        async function getWalletConnectProvider() {
+            if (walletConnectProvider) {
+                return walletConnectProvider;
+            }
+
+            if (!WALLETCONNECT_PROJECT_ID) {
+                await loadWalletConnectConfig();
+            }
+
+            if (!WALLETCONNECT_PROJECT_ID) {
+                throw new Error('WalletConnect is not configured. Missing WALLETCONNECT_PROJECT_ID.');
+            }
+
+            // GoodDollar-style stack uses Reown AppKit CDN. We prefer it when available.
+            const reownAvailable = !!(window.ReownAppKit || window.reown || window.createAppKit);
+            if (reownAvailable) {
+                console.log('✅ Reown AppKit CDN detected (GoodDollar-compatible stack).');
+            } else {
+                console.warn('⚠️ Reown AppKit CDN not detected, falling back to WalletConnect Ethereum Provider.');
+            }
+
+            if (!window.WalletConnectEthereumProvider || !window.WalletConnectEthereumProvider.default) {
+                throw new Error('WalletConnect provider library failed to load.');
+            }
+
+            walletConnectProvider = await window.WalletConnectEthereumProvider.default.init({
+                projectId: WALLETCONNECT_PROJECT_ID,
+                chains: [42220],
+                showQrModal: true,
+                methods: ['eth_sendTransaction', 'personal_sign', 'eth_signTypedData', 'eth_signTypedData_v4'],
+                events: ['chainChanged', 'accountsChanged']
+            });
+
+            return walletConnectProvider;
+        }
+
         // Check if user should return to community stories after login
         window.addEventListener('load', function() {
             const returnToCommunityStories = sessionStorage.getItem('return_to_community_stories');
@@ -943,47 +977,37 @@
         }
 
         async function connectWallet() {
-            const walletAddress = document.getElementById('walletAddress').value.trim();
             const referralCode = document.getElementById('referralCode').value.trim();
             const statusDiv = document.getElementById('statusMessage');
-            const connectBtn = document.querySelector('.connect-btn');
+            const connectBtn = document.getElementById('connectWalletBtn');
             const btnText = document.getElementById('connectBtnText');
 
-            if (!walletAddress) {
-                statusDiv.className = 'status-message error';
-                statusDiv.textContent = 'Please enter your GoodDollar wallet address';
-                statusDiv.style.display = 'block';
-                return;
-            }
+            btnText.textContent = 'Opening WalletConnect...';
+            connectBtn.disabled = true;
 
-            // Validate wallet format
-            if (!walletAddress.startsWith('0x') || walletAddress.length !== 42) {
-                statusDiv.className = 'status-message error';
-                statusDiv.textContent = 'Invalid GoodDollar wallet address format';
-                statusDiv.style.display = 'block';
-                return;
-            }
-
-            // Check for maintenance mode first, passing the wallet address
             try {
+                const provider = await getWalletConnectProvider();
+                const accounts = await provider.enable();
+                const walletAddress = accounts && accounts[0] ? accounts[0] : '';
+
+                if (!walletAddress || !walletAddress.startsWith('0x') || walletAddress.length !== 42) {
+                    throw new Error('Failed to read a valid wallet address from WalletConnect.');
+                }
+
                 const maintenanceResponse = await fetch(`/api/maintenance-status?feature=wallet_connection&wallet=${walletAddress}`);
                 const maintenanceData = await maintenanceResponse.json();
-                
+
                 if (maintenanceData.success && maintenanceData.is_maintenance) {
                     statusDiv.className = 'status-message error';
                     statusDiv.textContent = maintenanceData.message || 'Wallet connection is currently under maintenance. Please try again later.';
                     statusDiv.style.display = 'block';
+                    btnText.textContent = 'Connect via WalletConnect';
+                    connectBtn.disabled = false;
                     return;
                 }
-            } catch (err) {
-                console.error('Error checking maintenance status:', err);
-            }
 
-            // Show loading state
-            btnText.textContent = 'Connecting...';
-            connectBtn.disabled = true;
+                btnText.textContent = 'Verifying wallet...';
 
-            try {
                 const response = await fetch('/verify-identity', {
                     method: 'POST',
                     headers: {
@@ -1000,27 +1024,21 @@
                 if (data.success) {
                     statusDiv.className = 'status-message success';
                     statusDiv.textContent = '✅ Wallet connected successfully! Redirecting...';
-
-                    // Preserve sessionStorage flag if set
-                    const returnToCommunityStories = sessionStorage.getItem('return_to_community_stories');
-                    if (returnToCommunityStories === 'true') {
-                        console.log('🔍 Preserving return_to_community_stories flag');
-                    }
+                    statusDiv.style.display = 'block';
 
                     setTimeout(() => {
-                        window.location.href = data.redirect_to || '/terms-and-service';
-                    }, 1500);
-                } else {
-                    statusDiv.className = 'status-message error';
-                    statusDiv.textContent = data.error || data.message || 'Connection failed';
-                    btnText.textContent = 'Connect GoodDollar Wallet';
-                    connectBtn.disabled = false;
+                        window.location.href = data.redirect_to || '/overview';
+                    }, 1200);
+                    return;
                 }
+
+                throw new Error(data.error || data.message || 'Connection failed');
             } catch (error) {
-                console.error('Connection error:', error);
+                console.error('WalletConnect error:', error);
                 statusDiv.className = 'status-message error';
-                statusDiv.textContent = 'Connection failed. Please try again.';
-                btnText.textContent = 'Connect GoodDollar Wallet';
+                statusDiv.textContent = error.message || 'Wallet connection failed. Please try again.';
+                statusDiv.style.display = 'block';
+                btnText.textContent = 'Connect via WalletConnect';
                 connectBtn.disabled = false;
             }
         }
@@ -1032,12 +1050,6 @@
             }
         });
 
-        // Allow Enter key to submit
-        document.getElementById('walletAddress').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                connectWallet();
-            }
-        });
 
         // Load developer profiles
         async function loadDeveloperProfile() {

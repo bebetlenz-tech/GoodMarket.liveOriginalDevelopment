@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify, render_template, session, redirect
 from blockchain import has_recent_ubi_claim
 from analytics_service import analytics
 from routes import routes
+from wallet_connect import init_wallet_connect
 # Removed: from hour_bonus import (...)
 from learn_and_earn import init_learn_and_earn
 from web3 import Web3
@@ -249,6 +250,12 @@ if not initialize_smart_contract():
 # This must be before any catch-all routes
 app.register_blueprint(routes)
 logger.info("✅ Routes blueprint registered with API endpoints")
+
+# Initialize WalletConnect module
+if not init_wallet_connect(app):
+    logger.warning("⚠️ WalletConnect module initialization failed")
+else:
+    logger.info("✅ WalletConnect module initialized successfully")
 
 # Register GoodMarket blueprint
 # Removed: from goodmarket.routes import goodmarket_bp
