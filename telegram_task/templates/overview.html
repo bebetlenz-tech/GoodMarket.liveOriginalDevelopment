@@ -1,0 +1,1059 @@
+<script>
+// Handle auto-logout for expired sessions
+document.addEventListener('DOMContentLoaded', function() {
+    // Check authentication status on API calls
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+        return originalFetch.apply(this, args)
+            .then(response => {
+                if (response.status === 401) {
+                    return response.json().then(data => {
+                        if (data.auto_logout) {
+                            // Session expired - redirect to login
+                            window.location.href = '/';
+                        }
+                        throw new Error(data.error || 'Authentication required');
+                    });
+                }
+                return response;
+            });
+    };
+});
+</script>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Overview - GoodMarket Analytics</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#3b82f6">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GoodMarket">
+    <link rel="manifest" href="/static/manifest.json">
+    <link rel="apple-touch-icon" href="/static/icons/icon-192x192.png">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #ffffff;
+            min-height: 100vh;
+            color: #1f2937;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+
+
+
+
+
+
+        .navbar {
+            background: #ffffff;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #7c3aed;
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: #6b7280;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+            font-size: 1rem;
+        }
+
+        .nav-links a:hover {
+            color: #7c3aed;
+        }
+
+        .nav-links a.active {
+            color: #1f2937;
+        }
+
+        .wallet-info {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 0.75rem 1.5rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 1rem;
+            font-weight: 600;
+            font-family: monospace;
+            font-size: 0.95rem;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1.5rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .page-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            color: #1f2937;
+            letter-spacing: -1px;
+        }
+
+        .page-subtitle {
+            color: #6b7280;
+            font-size: 1.1rem;
+            font-weight: 400;
+        }
+
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
+        }
+
+        .analytics-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.1);
+        }
+
+        .card-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: #6b7280;
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #1f2937;
+            font-weight: 700;
+            font-size: 1.1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .insight-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .insight-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.1);
+        }
+
+        .insight-header {
+            color: #1f2937;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .country-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .country-tag {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4facfe, #00f2fe);
+            transition: width 0.3s ease;
+        }
+
+        .refresh-btn {
+            background: #7c3aed;
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 20px auto;
+            display: block;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+        }
+
+        .refresh-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
+        }
+
+        .dashboard-btn {
+            display: inline-block;
+            background: #7c3aed;
+            color: white;
+            text-decoration: none;
+            padding: 1rem 2rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-top: 20px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(124, 58, 237, 0.2);
+        }
+
+        .dashboard-btn:hover {
+            background: #6d28d9;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(124, 58, 237, 0.3);
+            color: white;
+        }
+
+        /* New Styles for Action Buttons */
+        .action-btn {
+            background: linear-gradient(135deg, #667eea, #764ba2, #4facfe, #00f2fe);
+            background-size: 300% 300%;
+            animation: gradientShift 4s ease infinite;
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.23, 1, 0.320, 1);
+            text-decoration: none;
+            display: inline-block;
+            margin: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            position: relative;
+            overflow: hidden;
+            box-shadow:
+                0 8px 25px rgba(79, 172, 254, 0.4),
+                0 4px 15px rgba(118, 75, 162, 0.3),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .action-btn::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.3) 0%, transparent 70%);
+            transform: scale(0);
+            transition: transform 0.6s ease;
+        }
+
+        .action-btn:hover::before {
+            transform: scale(1);
+        }
+
+        .action-btn:hover {
+            color: white;
+        }
+
+        .action-btn:active {
+            transform: translateY(-1px) scale(1.02);
+        }
+
+        .action-btn:disabled {
+            background: linear-gradient(135deg, #6c757d, #495057);
+            cursor: not-allowed;
+            opacity: 0.7;
+            animation: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .action-btn:disabled::after {
+            content: '🔒';
+            position: absolute;
+            top: 50%;
+            right: 10px;
+            transform: translateY(-50%);
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .action-btn:disabled:hover {
+            transform: none;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+            background-size: 300% 300%;
+        }
+
+
+
+        @media (max-width: 768px) {
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .page-title {
+                font-size: 2rem;
+            }
+        }
+
+        .btn-loader {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .spinner {
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .cta-button {
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .cta-button.processing {
+            pointer-events: none;
+        }
+
+        .btn-content {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-content .cta-icon {
+            transition: transform 0.3s ease;
+        }
+
+        .cta-button:hover:not(:disabled) .btn-content .cta-icon {
+            transform: scale(1.1);
+        }
+
+        .feature-card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            padding: 2rem;
+            text-align: center;
+            text-decoration: none;
+            color: #1f2937;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(124, 58, 237, 0.1);
+        }
+
+        .card-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .feature-card p {
+            font-size: 0.9rem;
+            color: #6b7280;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="/dashboard" class="logo">💰 GoodMarket</a>
+            <div class="nav-links">
+                <a href="/overview" style="color: white; font-weight: 700;">Overview</a>
+                {% if wallet and wallet != 'None' %}
+                <a href="/dashboard">Dashboard</a>
+                <a href="/admin" id="adminLink" style="display: none;">Admin</a>
+                <a href="/logout">Logout</a>
+                <div class="wallet-info">
+                    {{ wallet[:6] }}...{{ wallet[-4:] }}
+                </div>
+                {% else %}
+                <a href="/" class="action-btn" style="padding: 0.5rem 1.5rem; margin: 0;">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="page-header">
+            <h1 class="page-title">📊 Analytics Overview</h1>
+            <p class="page-subtitle">Comprehensive insights into your GoodMarket activity and global network</p>
+            <a href="/dashboard" class="action-btn" id="dashboardBtn" onclick="showDashboardLoading(event)">
+                🚀 Enter GoodMarket Dashboard
+            </a>
+        </div>
+
+        <div class="analytics-grid">
+            <!-- Personal Analytics -->
+            {% if wallet and wallet != 'None' %}
+            <div class="analytics-card">
+                <div class="card-title">👤 Your Activity</div>
+                <div class="stat-row">
+                    <div class="stat-label">Page Views</div>
+                    <div class="stat-value">{{ data.user_stats.page_views }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Learn & Earn Quizzes</div>
+                    <div class="stat-value">{{ data.user_stats.learn_earn_quizzes }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">24-Hour Bonus Claims</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Telegram Task Claims</div>
+                    <div class="stat-value">{{ data.user_stats.telegram_task_claims }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Total G$ Earned</div>
+                    <div class="stat-value">{{ data.user_stats.total_rewards_earned }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Member Since</div>
+                    <div class="stat-value">{{ data.user_stats.member_since }}</div>
+                </div>
+            </div>
+            {% else %}
+            <div class="analytics-card" style="background: linear-gradient(135deg, rgba(124, 58, 237, 0.1), rgba(99, 102, 241, 0.1)); border: 2px solid rgba(124, 58, 237, 0.3);">
+                <div class="card-title">🔐 Login to View Your Activity</div>
+                <div style="text-align: center; padding: 2rem 1rem;">
+                    <p style="color: #6b7280; margin-bottom: 1.5rem;">Login to track your personal statistics and earnings</p>
+                    <a href="/" class="action-btn">Login Now</a>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Platform Statistics -->
+            <div class="analytics-card">
+                <div class="card-title">🌐 Platform Statistics</div>
+                <div class="stat-row">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value">{{ data.platform_stats.metrics.total_users }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Learn & Earn Users</div>
+                    <div class="stat-value">{{ data.platform_stats.metrics.learn_earn_users }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Telegram Task Users</div>
+                    <div class="stat-value">{{ data.platform_stats.metrics.telegram_task_users }}</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Global UBI Users</div>
+                    <div class="stat-value">{{ data.gooddollar_info.estimated_users }}</div>
+                </div>
+            </div>
+
+            <!-- Contract Balance -->
+            <div class="analytics-card">
+                <div class="card-title">💰 GoodDollar Balance</div>
+                {% if wallet and wallet != 'None' %}
+                <div class="stat-row">
+                    <div class="stat-label">Your G$ Balance</div>
+                    <div class="stat-value" id="user-balance">Loading...</div>
+                </div>
+                {% else %}
+                <div class="stat-row">
+                    <div class="stat-label">Your G$ Balance</div>
+                    <div class="stat-value">Login to view</div>
+                </div>
+                {% endif %}
+                <div class="stat-row">
+                    <div class="stat-label">Contract Address</div>
+                    <div class="stat-value" style="font-size: 0.9rem;" id="contract-address">Loading...</div>
+                </div>
+                <div class="stat-row">
+                    <div class="stat-label">Network</div>
+                    <div class="stat-value">Celo Mainnet</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Total G$ Disbursements Breakdown -->
+        <div class="insight-card">
+            <div class="insight-header">💰 Total G$ Disbursements Breakdown</div>
+            <div class="stat-row">
+                <div class="stat-label">Total Disbursed</div>
+                <div class="stat-value" style="color: #4facfe; font-size: 1.5rem;">
+                    {{ data.disbursement_analytics.total_g_disbursed_formatted if data.disbursement_analytics else '0 G$' }}
+                </div>
+            </div>
+
+            {% if data.disbursement_analytics and data.disbursement_analytics.breakdown_formatted %}
+                <div style="margin-top: 1.5rem;">
+                    <div style="font-size: 0.95rem; font-weight: 600; margin-bottom: 1rem; color: rgba(241, 245, 249, 0.9);">
+                        Platform Features Distribution:
+                    </div>
+
+                    {% for category, amount in data.disbursement_analytics.breakdown_formatted.items() %}
+                    <div class="stat-row" style="padding: 10px 0; border-bottom: 1px solid rgba(99, 102, 241, 0.1);">
+                        <div class="stat-label" style="font-size: 0.9rem;">
+                            {% if 'Learn & Earn' in category %}
+                                📚 {{ category }}
+                            {% elif '24-Hour' in category %}
+                                ⏰ {{ category }}
+                            {% elif 'Telegram' in category %}
+                                📱 {{ category }}
+                            {% elif 'Twitter' in category %}
+                                🐦 {{ category }}
+                            {% elif 'Community Stories' in category %}
+                                🌟 {{ category }}
+                            {% elif 'Minigames' in category %}
+                                🎮 {{ category }}
+                            {% endif %}
+                        </div>
+                        <div class="stat-value" style="font-size: 1rem; color: #00f2fe;">{{ amount }}</div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 20px; color: rgba(241, 245, 249, 0.5);">
+                    Loading disbursement data...
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Monthly Disbursements (Last 30 Days) -->
+        <div class="insight-card" style="background: rgba(0, 242, 254, 0.08); border: 1px solid rgba(0, 242, 254, 0.3);">
+            <div class="insight-header">📅 Monthly Disbursements (Last 30 Days)</div>
+
+            {% if data.disbursement_analytics and data.disbursement_analytics.monthly_breakdown_formatted %}
+                <!-- Date Range Display -->
+                {% if data.disbursement_analytics.monthly_date_range %}
+                <div style="background: rgba(0, 242, 254, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+                    <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.7); margin-bottom: 4px;">
+                        Report Period
+                    </div>
+                    <div style="font-size: 0.95rem; font-weight: 600; color: #00f2fe;">
+                        📆 {{ data.disbursement_analytics.monthly_date_range.start_date }} to {{ data.disbursement_analytics.monthly_date_range.end_date }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div style="margin-top: 1rem;">
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: 1px solid rgba(0, 242, 254, 0.2);">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            📚 Learn & Earn Quizzes
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #00f2fe; font-weight: 700;">
+                            {{ data.disbursement_analytics.monthly_breakdown_formatted.learn_earn }}
+                        </div>
+                    </div>
+
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: 1px solid rgba(0, 242, 254, 0.2);">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            📱 Telegram Task Posts
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #4facfe; font-weight: 700;">
+                            {{ data.disbursement_analytics.monthly_breakdown_formatted.telegram_task }}
+                        </div>
+                    </div>
+
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: none;">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            🐦 Twitter Task Rewards
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #00f2fe; font-weight: 700;">
+                            {{ data.disbursement_analytics.monthly_breakdown_formatted.twitter_task }}
+                        </div>
+                    </div>
+
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: none;">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            🌟 Community Stories
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #00f2fe; font-weight: 700;">
+                            {{ data.disbursement_analytics.monthly_breakdown_formatted.community_stories }}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(0, 242, 254, 0.2);">
+                        <div class="stat-row" style="padding: 0;">
+                            <div class="stat-label" style="font-size: 1rem; font-weight: 700; color: rgba(241, 245, 249, 1);">
+                                📊 Monthly Total
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem; color: #00f2fe; font-weight: 800;">
+                                {% if data.disbursement_analytics and data.disbursement_analytics.monthly_breakdown %}
+                                    {{ (data.disbursement_analytics.monthly_breakdown.get('learn_earn', 0) + data.disbursement_analytics.monthly_breakdown.get('telegram_task', 0) + data.disbursement_analytics.monthly_breakdown.get('twitter_task', 0) + data.disbursement_analytics.monthly_breakdown.get('community_stories', 0)) | round(2) }} G$
+                                {% else %}
+                                    0.00 G$
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 20px; color: rgba(241, 245, 249, 0.5);">
+                    Loading monthly data...
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Weekly Disbursements (Last 7 Days) -->
+        <div class="insight-card" style="background: rgba(79, 172, 254, 0.08); border: 1px solid rgba(79, 172, 254, 0.3);">
+            <div class="insight-header">📅 Weekly Disbursements (Last 7 Days)</div>
+
+            {% if data.disbursement_analytics and data.disbursement_analytics.weekly_breakdown_formatted %}
+                <!-- Date Range Display -->
+                {% if data.disbursement_analytics.weekly_date_range %}
+                <div style="background: rgba(79, 172, 254, 0.1); padding: 10px; border-radius: 8px; margin-bottom: 1rem; text-align: center;">
+                    <div style="font-size: 0.85rem; color: rgba(241, 245, 249, 0.7); margin-bottom: 4px;">
+                        Report Period
+                    </div>
+                    <div style="font-size: 0.95rem; font-weight: 600; color: #4facfe;">
+                        📆 {{ data.disbursement_analytics.weekly_date_range.start_date }} to {{ data.disbursement_analytics.weekly_date_range.end_date }}
+                    </div>
+                </div>
+                {% endif %}
+
+                <div style="margin-top: 1rem;">
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: 1px solid rgba(79, 172, 254, 0.2);">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            📚 Learn & Earn Quizzes
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #4facfe; font-weight: 700;">
+                            {{ data.disbursement_analytics.weekly_breakdown_formatted.learn_earn }}
+                        </div>
+                    </div>
+
+                    <div class="stat-row" style="padding: 12px 0; border-bottom: none;">
+                        <div class="stat-label" style="font-size: 0.95rem; font-weight: 600;">
+                            📱 Telegram Task Posts
+                        </div>
+                        <div class="stat-value" style="font-size: 1.2rem; color: #00f2fe; font-weight: 700;">
+                            {{ data.disbursement_analytics.weekly_breakdown_formatted.telegram_task }}
+                        </div>
+                    </div>
+
+                    <div class="stat-row">
+                        <div class="stat-label">🐦 Twitter Task Rewards</div>
+                        <div class="stat-value">
+                            {% if data.disbursement_analytics and data.disbursement_analytics.weekly_breakdown_formatted %}
+                                {{ data.disbursement_analytics.weekly_breakdown_formatted.get('twitter_task', '0.0 G$') }}
+                            {% else %}
+                                0.00 G$
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(79, 172, 254, 0.2);">
+                        <div class="stat-row" style="padding: 0;">
+                            <div class="stat-label" style="font-size: 1rem; font-weight: 700; color: rgba(241, 245, 249, 1);">
+                                Weekly Total
+                            </div>
+                            <div class="stat-value" style="font-size: 1.3rem; color: #00f2fe; font-weight: 800;">
+                                {% if data.disbursement_analytics and data.disbursement_analytics.weekly_breakdown %}
+                                    {{ (data.disbursement_analytics.weekly_breakdown.get('learn_earn', 0) + data.disbursement_analytics.weekly_breakdown.get('telegram_task', 0) + data.disbursement_analytics.weekly_breakdown.get('twitter_task', 0)) | round(2) }} G$
+                                {% else %}
+                                    0.00 G$
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div style="text-align: center; padding: 20px; color: rgba(241, 245, 249, 0.5);">
+                    Loading weekly data...
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Learn & Earn Daily Participants -->
+        <div class="insight-card" style="background: rgba(124, 58, 237, 0.08); border: 1px solid rgba(124, 58, 237, 0.3);">
+            <div class="insight-header">📚 Learn & Earn - Today's Participants</div>
+
+            <div style="margin-bottom: 1rem;">
+                <input type="date" id="participantDate" style="padding: 8px; border-radius: 8px; border: 1px solid rgba(124, 58, 237, 0.3); background: white; color: #1f2937; width: 100%; max-width: 200px;">
+                <button onclick="loadParticipants()" style="padding: 8px 16px; margin-left: 8px; background: #7c3aed; color: white; border: none; border-radius: 8px; cursor: pointer;">Load Participants</button>
+            </div>
+
+            <div id="participantsSummary" style="background: rgba(124, 58, 237, 0.1); padding: 15px; border-radius: 8px; margin-bottom: 1rem;">
+                <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                    <span style="font-weight: 600;">Total Participants:</span>
+                    <span id="totalParticipants" style="color: #7c3aed; font-weight: 700;">0</span>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <span style="font-weight: 600;">Total G$ Disbursed:</span>
+                    <span id="totalDisbursed" style="color: #7c3aed; font-weight: 700;">0.00 G$</span>
+                </div>
+            </div>
+
+            <div id="participantsList" style="max-height: 400px; overflow-y: auto;">
+                <div style="text-align: center; padding: 20px; color: #6b7280;">
+                    Loading today's participants...
+                </div>
+            </div>
+        </div>
+
+        <!-- Platform Analytics -->
+        <div class="insight-card">
+            <div class="insight-header">📈 Platform Insights</div>
+            <div class="stat-row">
+                <div class="stat-label">Total Platform Users</div>
+                <div class="stat-value">{{ data.platform_stats.metrics.total_users }}</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Learn & Earn Completions</div>
+                <div class="stat-value">{{ data.platform_stats.user_activity.learn_earn_completions }}</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Feature Users</div>
+                <div class="stat-value">{{ data.gooddollar_info.platform_features.total_feature_users }}</div>
+            </div>
+            <div class="stat-row">
+                <div class="stat-label">Verification Success Rate</div>
+                <div class="stat-value">{{ data.platform_stats.verification_stats.success_rate }}</div>
+            </div>
+        </div>
+
+        <button class="refresh-btn" onclick="refreshAnalytics()">🔄 Refresh Analytics</button>
+    </div>
+
+    <script>
+        function refreshAnalytics() {
+            window.location.reload();
+        }
+
+        // Show loading message when navigating to dashboard
+        function showDashboardLoading(event) {
+            const btn = event.target;
+            const originalText = btn.innerHTML;
+
+            // Show processing message
+            btn.innerHTML = '<span style="display: flex; align-items: center; gap: 8px;"><div class="loading-spinner" style="width: 16px; height: 16px; border: 2px solid rgba(255,255,255,0.3); border-top-color: white; margin: 0;"></div> Loading Dashboard...</span>';
+            btn.style.pointerEvents = 'none';
+            btn.style.opacity = '0.8';
+
+            // Allow navigation to proceed
+            return true;
+        }
+
+        // Update balance display function
+        function updateBalanceDisplay(data) {
+            console.log('Updating Balance Display with:', data);
+
+            const userBalanceElement = document.getElementById('user-balance');
+            const contractAddressElement = document.getElementById('contract-address');
+
+            if (data && data.success) {
+                if (userBalanceElement) {
+                    userBalanceElement.textContent = data.balance_formatted || 'Error';
+                }
+                if (contractAddressElement) {
+                    const address = data.contract || 'Unknown';
+                    contractAddressElement.textContent = address.substring(0, 6) + '...' + address.substring(address.length - 4);
+                    contractAddressElement.title = address; // Show full address on hover
+                }
+            } else {
+                if (userBalanceElement) {
+                    userBalanceElement.textContent = 'Error loading';
+                }
+                if (contractAddressElement) {
+                    contractAddressElement.textContent = 'Error loading';
+                }
+            }
+        }
+
+        // Retry logic with exponential backoff
+        async function fetchWithRetry(url, maxRetries = 3) {
+            for (let i = 0; i < maxRetries; i++) {
+                try {
+                    const response = await fetch(url);
+
+                    if (!response.ok) {
+                        if (i === maxRetries - 1) throw new Error(`HTTP error! status: ${response.status}`);
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000)); // Exponential backoff
+                        continue;
+                    }
+
+                    const contentType = response.headers.get("content-type");
+                    if (!contentType || !contentType.includes("application/json")) {
+                        if (i === maxRetries - 1) throw new Error('Non-JSON response');
+                        await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                        continue;
+                    }
+
+                    return await response.json();
+                } catch (error) {
+                    if (i === maxRetries - 1) throw error;
+                    await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
+                }
+            }
+        }
+
+        // Fetch all necessary data on load
+        async function loadAnalyticsData() {
+            const walletAddress = "{{ wallet }}";
+
+            // Load wallet balance only (Learn & Earn eligibility not needed on overview page)
+            if (walletAddress && walletAddress !== 'None' && walletAddress !== '') {
+                try {
+                    const data = await fetchWithRetry(`/api/balance/${encodeURIComponent(walletAddress)}`);
+
+                    console.log('Balance API Raw Response:', JSON.stringify(data, null, 2));
+                    console.log('Balance API Parsed Data:', data);
+
+                    if (!data || typeof data !== 'object') {
+                        console.error('❌ Invalid balance data structure:', data);
+                        updateBalanceDisplay({ success: false, balance_formatted: 'Error loading' });
+                        return;
+                    }
+
+                    updateBalanceDisplay(data);
+                } catch (error) {
+                    console.error('❌ Balance API Error after retries:', error.message || error);
+                    updateBalanceDisplay({ success: false, balance_formatted: 'Connection error - please refresh' });
+                }
+            }
+        }
+
+        // Run on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            const wallet = '{{ wallet if wallet else "" }}';
+            if (wallet && wallet !== 'None' && wallet !== '') {
+                loadAnalyticsData();
+            }
+
+            // Set today's date as default (use local timezone)
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            const todayString = `${yyyy}-${mm}-${dd}`;
+
+            document.getElementById('participantDate').value = todayString;
+
+            // Auto-load today's participants after a short delay
+            setTimeout(() => {
+                loadParticipants();
+            }, 500);
+
+            // Refresh analytics data every 60 seconds
+            setInterval(function() {
+                if (wallet && wallet !== 'None' && wallet !== '') {
+                    loadAnalyticsData();
+                }
+            }, 60000);
+        });
+
+        // Load Learn & Earn participants for selected date
+        async function loadParticipants() {
+            try {
+                const dateInput = document.getElementById('participantDate');
+                const selectedDate = dateInput.value;
+
+                if (!selectedDate) {
+                    alert('Please select a date');
+                    return;
+                }
+
+                console.log(`📊 Loading participants for ${selectedDate}...`);
+
+                const response = await fetch(`/api/learn-earn-participants?date=${selectedDate}`);
+                const data = await response.json();
+
+                console.log('Participants data:', data);
+
+                if (data.success) {
+                    // Update summary
+                    document.getElementById('totalParticipants').textContent = data.total_count || 0;
+                    document.getElementById('totalDisbursed').textContent = data.total_g_disbursed_formatted || '0.00 G$';
+
+                    // Update participants list
+                    const listContainer = document.getElementById('participantsList');
+
+                    if (!data.participants || data.participants.length === 0) {
+                        listContainer.innerHTML = `
+                            <div style="text-align: center; padding: 20px; color: #6b7280;">
+                                No participants found for ${selectedDate}
+                            </div>
+                        `;
+                    } else {
+                        let html = '<div style="display: flex; flex-direction: column; gap: 8px;">';
+
+                        data.participants.forEach((participant, index) => {
+                            html += `
+                                <div style="background: rgba(124, 58, 237, 0.05); padding: 12px; border-radius: 8px; border: 1px solid rgba(124, 58, 237, 0.2);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                                        <div>
+                                            <span style="font-weight: 600; color: #7c3aed;">#${index + 1}</span>
+                                            <span style="margin-left: 8px; font-weight: 600; color: #1f2937;">${participant.display_name}</span>
+                                        </div>
+                                        <div style="font-weight: 700; color: #7c3aed; font-size: 1.1rem;">
+                                            ${participant.amount_formatted}
+                                        </div>
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 4px;">
+                                        <strong>Wallet:</strong> ${participant.wallet_address}
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #6b7280; margin-bottom: 4px;">
+                                        <strong>TX Hash:</strong>
+                                        ${participant.transaction_hash && participant.transaction_hash !== 'N/A'
+                                            ? `<a href="https://explorer.celo.org/mainnet/tx/${participant.transaction_hash}" target="_blank" style="color: #4facfe; text-decoration: underline;">${participant.transaction_hash.substring(0, 10)}...${participant.transaction_hash.substring(participant.transaction_hash.length - 8)}</a>`
+                                            : 'N/A'
+                                        }
+                                    </div>
+                                    <div style="font-size: 0.85rem; color: #6b7280;">
+                                        <strong>Time:</strong> ${new Date(participant.timestamp).toLocaleString()}
+                                    </div>
+                                </div>
+                            `;
+                        });
+
+                        html += '</div>';
+                        listContainer.innerHTML = html;
+                    }
+
+                    console.log(`✅ Loaded ${data.total_count} participants for ${selectedDate}`);
+                } else {
+                    console.error('❌ Failed to load participants:', data.error);
+                    const listContainer = document.getElementById('participantsList');
+                    listContainer.innerHTML = `
+                        <div style="text-align: center; padding: 20px; color: #ef4444;">
+                            ⚠️ Failed to load participants. Please try again.
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('❌ Error loading participants:', error);
+                const listContainer = document.getElementById('participantsList');
+                listContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: #ef4444;">
+                        ⚠️ Error loading participants. Please try again.
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html>
