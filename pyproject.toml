@@ -1,0 +1,27 @@
+
+[project]
+name = "python-template"
+version = "0.1.0"
+description = ""
+authors = ["Your Name <you@example.com>"]
+requires-python = ">=3.11"
+dependencies = [
+    "beautifulsoup4>=4.14.2",
+    "email-validator>=2.3.0",
+    "eth-account>=0.13.7",
+    "flask>=3.1.2",
+    "flask-compress>=1.23",
+    "flask-sqlalchemy>=3.1.1",
+    "gunicorn>=23.0.0",
+    "lxml>=6.0.2",
+    "markupsafe>=3.0.3",
+    "nest-asyncio>=1.6.0",
+    "phonenumbers>=9.0.13",
+    "pillow>=12.0.0",
+    "psycopg2-binary>=2.9.11",
+    "py-solc-x>=2.0.4",
+    "pytz>=2025.2",
+    "requests>=2.32.5",
+    "supabase>=2.18.1",
+    "web3>=7.13.0",
+]
